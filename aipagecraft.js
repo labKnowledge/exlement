@@ -1474,6 +1474,306 @@ class PageContentGenerator extends HTMLElement {
   }
 }
 
+class PageProofreader extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this.aiType = "openai";
+    this.model = "";
+    this.serverUrl = "";
+    this.responseKey = "";
+  }
+
+  static get observedAttributes() {
+    return ["ai-type", "model", "server-url", "response-key"];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    switch (name) {
+      case "ai-type":
+        this.aiType = newValue;
+        break;
+      case "model":
+        this.model = newValue;
+        break;
+      case "server-url":
+        this.serverUrl = newValue;
+        break;
+      case "response-key":
+        this.responseKey = newValue;
+        break;
+    }
+  }
+
+  connectedCallback() {
+    this.render();
+    this.setupEventListeners();
+  }
+
+  render() {
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          --primary-color: #4a90e2;
+          --secondary-color: #2c3e50;
+          --background-color: #f9f9f9;
+          --text-color: #333;
+          --border-color: #e0e0e0;
+          --success-color: #27ae60;
+          --error-color: #e74c3c;
+
+          display: block;
+          font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+          max-width: 1200px;
+          margin: 2rem auto;
+          padding: 2rem;
+          background-color: var(--background-color);
+          color: var(--text-color);
+          border-radius: 12px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .proofreader {
+          display: flex;
+          gap: 2rem;
+        }
+        .input-section, .output-section {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          background-color: white;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .section-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem;
+          background-color: var(--secondary-color);
+          color: white;
+        }
+        label {
+          font-weight: 600;
+          font-size: 1.1rem;
+        }
+        textarea {
+          width: 100%;
+          height: 400px;
+          padding: 1rem;
+          border: none;
+          font-size: 1rem;
+          line-height: 1.6;
+          resize: vertical;
+          font-family: inherit;
+        }
+        textarea:focus {
+          outline: none;
+        }
+        button {
+          padding: 0.6rem 1.2rem;
+          border: none;
+          border-radius: 4px;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          background-color: var(--primary-color);
+          color: white;
+        }
+        button:hover {
+          background-color: #3498db;
+          transform: translateY(-2px);
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        button:active {
+          transform: translateY(0);
+        }
+        .output {
+          padding: 1rem;
+          height: 400px;
+          overflow-y: auto;
+          white-space: pre-wrap;
+          font-size: 1rem;
+          line-height: 1.6;
+        }
+        .loading {
+          text-align: center;
+          font-style: italic;
+          color: var(--text-color);
+          padding: 1rem;
+        }
+        .success {
+          color: var(--success-color);
+          font-weight: 600;
+        }
+        .error {
+          color: var(--error-color);
+          font-weight: 600;
+        }
+        .copy-btn {
+          background-color: transparent;
+          color: white;
+          padding: 0.4rem 0.8rem;
+          font-size: 0.9rem;
+        }
+        .copy-btn:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+        @media (max-width: 768px) {
+          .proofreader {
+            flex-direction: column;
+          }
+        }
+      </style>
+      <div class="proofreader">
+        <div class="input-section">
+          <div class="section-header">
+            <label for="input">Original Text</label>
+            <button id="proofread">Proofread</button>
+          </div>
+          <textarea id="input" placeholder="Enter your text here for proofreading..."></textarea>
+        </div>
+        <div class="output-section">
+          <div class="section-header">
+            <label for="output">Proofread Result</label>
+            <button id="copy" class="copy-btn">Copy</button>
+          </div>
+          <div id="output" class="output"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  setupEventListeners() {
+    const proofreadButton = this.shadowRoot.getElementById("proofread");
+    proofreadButton.addEventListener("click", () => this.proofread());
+
+    const copyButton = this.shadowRoot.getElementById("copy");
+    copyButton.addEventListener("click", () => this.copyOutput());
+  }
+
+  async proofread() {
+    const input = this.shadowRoot.getElementById("input").value;
+    const output = this.shadowRoot.getElementById("output");
+
+    if (!input.trim()) {
+      output.innerHTML =
+        '<span class="error">Please enter some text to proofread.</span>';
+      return;
+    }
+
+    output.innerHTML = '<div class="loading">Proofreading...</div>';
+
+    try {
+      if (this.aiType === "ollama") {
+        await this.proofreadOllama(input);
+      } else if (this.aiType === "openai") {
+        const result = await this.proofreadOpenAI(input);
+        output.innerHTML = `${result}`;
+      } else {
+        const result = await this.proofreadCustom(input);
+        output.innerHTML = `${result}`;
+      }
+    } catch (error) {
+      output.innerHTML =
+        '<span class="error">Error proofreading text. Please try again.</span>';
+      console.error("Error:", error);
+    }
+  }
+
+  async proofreadOllama(input) {
+    const output = this.shadowRoot.getElementById("output");
+    const prompt = `Proofread the following text. No comments, no verbose or any indication of results like (Here's a corrected version ) and the like. produce just text:\n\n${input}`;
+
+    const response = await fetch(this.serverUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: this.model,
+        prompt: prompt,
+        stream: true,
+      }),
+    });
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value);
+      const parsedChunk = JSON.parse(chunk);
+      output.innerHTML += parsedChunk.response;
+    }
+  }
+
+  async proofreadOpenAI(input) {
+    const prompt = `Proofread the following text. No comment, no verbose:\n\n${input}`;
+
+    const response = await fetch(this.serverUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: this.model,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+  }
+
+  async proofreadCustom(input) {
+    const prompt = `Proofread the following text. no comments. no verbose:\n\n${input}`;
+
+    const response = await fetch(this.serverUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt }),
+    });
+
+    const data = await response.json();
+    return this.extractResponse(data);
+  }
+
+  extractResponse(response) {
+    if (this.responseKey) {
+      const keys = this.responseKey.split(".");
+      let result = response;
+      for (const key of keys) {
+        result = result[key];
+        if (result === undefined) {
+          console.error(`Key "${key}" not found in response`);
+          return response;
+        }
+      }
+      return result;
+    }
+    return response;
+  }
+
+  copyOutput() {
+    const output = this.shadowRoot.getElementById("output");
+    const text = output.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const copyButton = this.shadowRoot.getElementById("copy");
+      const originalText = copyButton.innerText;
+      copyButton.innerText = "Copied!";
+      setTimeout(() => {
+        copyButton.innerText = originalText;
+      }, 2000);
+    });
+  }
+}
+
+customElements.define("page-proofreader", PageProofreader);
 customElements.define("page-content-generator", PageContentGenerator);
 customElements.define("page-chat", PageChat);
 customElements.define("page-tabs", PageTabs);
