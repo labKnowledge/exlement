@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Interesting App</title>
+    <link rel="stylesheet" href="/aipagecraft.css">
+    <script src="/aipagecraft.js">
+
+    </script>
+</head>
+
+<body>
+    <page-base>
+        <!-- <page-top data='{"logo": "http://tlab.com/logo.png", "links": ["home", "about", "contact us"]}'
+            option='{"logo": "left"}'></page-top> -->
+        <page-nav-menu theme="dark" animation="slide" logo="path/to/logo.png" logo-position="left" items='[
+                {"text": "Home", "url": "#home"},
+                {"text": "Products", "submenu": [
+                    {"text": "Category 1", "url": "#cat1"},
+                    {"text": "Category 2", "url": "#cat2"}
+                ]},
+                {"text": "About", "url": "#about"}
+            ]'></page-nav-menu>
+        <page-container>
+            <page-content level="1" text="Welcome to our website!">what</page-content>
+            <page-content level="7"
+                text="This is a simple example of using custom elements to build a website."></page-content>
+            <page-content level="8" text="This is an inline text."></page-content>
+            <page-content level="7" text="This is another paragraph."></page-content>
+            <page-layout column="1">
+                <page-container>
+                    <page-content-generator
+                        server-url="https://takenolab-ollama-server.18hbq0.easypanel.host/api/generate" ai-type="ollama"
+                        model="llama3">
+                    </page-content-generator>
+                </page-container>
+                <page-container>
+                    <page-chat server-url="https://takenolab-ollama-server.18hbq0.easypanel.host/api/chat"
+                        chat-type="ollama" model="llama3">
+                    </page-chat>
+                </page-container>
+        </page-container>
+        <page-container>
+
+            <page-container>
+                <page-content level="1" text="Two-Column Layout Example"></page-content>
+                <page-layout column="2" options='{"size": "side-bar-right"}'>
+                    <page-container>
+                        <page-content level="2" text="Main Content"></page-content>
+                        <page-content level="7" text="This is the main content area."></page-content>
+                    </page-container>
+                    <page-container>
+                        <page-content level="2" text="Sidebar"></page-content>
+                        <page-content level="7" text="This is the sidebar area."></page-content>
+                    </page-container>
+                </page-layout>
+
+                <page-content level="1" text="Three-Column Layout Example"></page-content>
+                <page-layout column="3" options='{"size": "same"}'>
+                    <page-container>
+                        <page-content level="3" text="Column 1"></page-content>
+                        <page-content level="7" text="Content for column 1."></page-content>
+                    </page-container>
+                    <page-container>
+                        <page-content level="3" text="Column 2"></page-content>
+                        <page-content level="7" text="Content for column 2."></page-content>
+                    </page-container>
+                    <page-container>
+                        <page-content level="3" text="Column 3"></page-content>
+                        <page-content level="7" text="Content for column 3."></page-content>
+                    </page-container>
+                </page-layout>
+            </page-container>
+
+            <page-content level="1" text="Card Layout Example"></page-content>
+            <page-card-layout columns="2">
+                <page-card>
+                    <page-content level="3" text="Card 1"></page-content>
+                    <page-content level="7" text="This is the content for card 1."></page-content>
+                </page-card>
+                <page-card>
+                    <page-content level="3" text="Card 2"></page-content>
+                    <page-content level="7" text="This is the content for card 2."></page-content>
+                </page-card>
+                <page-card>
+                    <page-content level="3" text="Card 3"></page-content>
+                    <page-content level="7" text="This is the content for card 3."></page-content>
+                </page-card>
+            </page-card-layout>
+        </page-container>
+        <page-container>
+            <page-image-gallery layout="grid" columns="9" slide-interval="3000" images='[
+                {"src": "https://picsum.photos/450/300?random=1", "alt": "Description 1"},
+                {"src": "https://picsum.photos/450/300?random=2", "alt": "Description 2"},
+                {"src": "https://picsum.photos/450/300?random=3", "alt": "Description 3"}
+            ]'></page-image-gallery>
+
+        </page-container>
+
+        <page-container>
+            <page-tabs theme="dark" tabs='[
+                                {"title": "Tab 1", "content": "<p>Content for tab 1</p>"},
+                                {"title": "Tab 2", "content": "<p>Content for tab 2</p>"},
+                                {"title": "Tab 3", "content": "<p>Content for tab 3</p>"}
+                            ]'></page-tabs>
+        </page-container>
+        </page-container>
+        <page-bottom data='{"copyright": "ours", "links": ["about us", "contact us"]}'></page-bottom>
+    </page-base>
+</body>
+
+</html>

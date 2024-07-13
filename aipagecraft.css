@@ -1,0 +1,56 @@
+  body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100%;
+        }
+
+        page-base {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        page-top {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        page-top img {
+            max-height: 50px;
+        }
+
+        page-top nav {
+            display: flex;
+            gap: 1rem;
+        }
+
+        page-top nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+
+        page-container {
+            padding: 2rem;
+            flex-grow: 1;
+        }
+
+        page-bottom {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        page-bottom nav {
+            margin-top: 1rem;
+        }
+
+        page-bottom nav a {
+            margin: 0 0.5rem;
+            text-decoration: none;
+            color: #666;
+        }

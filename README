@@ -1,0 +1,84 @@
+# AIPageCraft
+
+AIPageCraft is an innovative, open-source web development framework designed to simplify the creation of AI-powered tools and applications. By leveraging the power of Web Components and intuitive JSON-based configurations, AIPageCraft enables developers and AI enthusiasts to rapidly prototype and build sophisticated AI interfaces with minimal coding.
+
+## Features
+
+- Declarative Syntax: Use custom HTML elements to structure your AI application effortlessly.
+- JSON Configuration: Easily configure components using simple JSON structures.
+- Flexible Layouts: Customize layouts with built-in options for responsive design.
+- AI-Ready Components: Pre-built components optimized for common AI interface patterns.
+- Extensible: Create your own custom components to suit specific AI tool requirements.
+- Lightweight: Minimal overhead, ensuring fast loading times for AI applications.
+- Framework Agnostic: Can be integrated with any JavaScript framework or used standalone.
+
+## Getting Started
+
+1. Include AIPageCraft in your project:
+    ```
+    <link rel="stylesheet" href="https://cdn.aipagecraft.com/aipagecraft.css">
+    ```
+
+   ```
+   <script src="https://cdn.aipagecraft.com/aipagecraft.js"></script>
+   ```
+
+2. Start using AIPageCraft components in your HTML:
+
+   ```<page-base>
+     <page-top 
+       data='{"logo": "logo.png", "links": ["Home", "About", "Contact"]}'
+       option='{"logo": "left"}'
+     ></page-top>
+     <page-container>
+       <page-content level="1" text="Welcome to AIPageCraft!"></page-content>
+       <page-content level="7" text="Build AI tools with ease."></page-content>
+     </page-container>
+     <page-bottom data='{"copyright": "2024 AIPageCraft", "links": ["Privacy", "Terms"]}'></page-bottom>
+   </page-base>```
+
+## Components
+
+### page-base
+The root container for your AIPageCraft application.
+
+### page-top
+The top section of your page, typically containing a logo and navigation.
+
+Attributes:
+- `data`: JSON string with `logo` (URL) and `links` (array of link texts)
+- `option`: JSON string with `logo` position ("left", "right", or "center")
+
+### page-container
+A container for your main content.
+
+### page-content
+A content block with customizable appearance.
+
+Attributes:
+- `level`: Number from 1-8, determining the style (1-6 for headings, 7 for paragraphs, 8 for inline text)
+- `text`: The content text
+
+### page-bottom
+The bottom section of your page, typically containing copyright info and links.
+
+Attributes:
+- `data`: JSON string with `copyright` (text) and `links` (array of link texts)
+
+## Customization
+
+AIPageCraft is designed to be easily customizable. You can modify the `aipagecraft.css` file to change the default styles, or create your own stylesheet to override the default styles.
+
+## Contributing
+
+We welcome contributions to AIPageCraft! Please see our [Contributing Guide](CONTRIBUTING.md) for more details.
+
+## License
+
+AIPageCraft is released under the MIT License. See the [LICENSE](LICENSE) file for more details.
+
+## Support
+
+For support, please open an issue on our [GitHub repository](https://github.com/AIPageCraft/aipagecraft) or join our [community forum](https://forum.aipagecraft.com).
+
+Happy coding with AIPageCraft!
