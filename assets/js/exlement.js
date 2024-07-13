@@ -1447,6 +1447,7 @@ class PageContentGenerator extends HTMLElement {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`,
         },
         body: JSON.stringify({
           model: this.model,
@@ -1713,6 +1714,7 @@ class PageProofreader extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${this.apiKey}`,
       },
       body: JSON.stringify({
         model: this.model,
@@ -1857,7 +1859,6 @@ class PageAICodeEditor extends HTMLElement {
         }
         #code-editor {
           width: 100%;
-          height: 400px;
         }
         .suggestions {
           padding: 1rem;
@@ -1893,6 +1894,8 @@ class PageAICodeEditor extends HTMLElement {
           background-color: #5af78e;
         }
         .preview-container {
+          display: flex;
+          flex-direction: column;
           background-color: #f8f8f2;
           border-top: 1px solid #44475a;
           padding: 1rem;
@@ -1930,8 +1933,8 @@ class PageAICodeEditor extends HTMLElement {
               <option value="css">CSS</option>
             </select>
             <select class="ai-type-select">
-              <option value="openai">OpenAI</option>
               <option value="ollama">Ollama</option>
+              <option value="openai">OpenAI</option>
             </select>
             <input type="password" id="api-key-input" placeholder="API Key" style="display: none;">
           </div>

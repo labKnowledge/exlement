@@ -5,17 +5,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Interesting App</title>
-    <link rel="stylesheet" href="/assets/css/express_element.css">
-    <script src="/assets/js/express_element.js">
+    <link rel="stylesheet" href="../assets/css/exlement.css">
+    <script src="../assets/js/exlement.js">
 
     </script>
 </head>
 
 <body>
     <page-base>
-        <!-- <page-top data='{"logo": "http://tlab.com/logo.png", "links": ["home", "about", "contact us"]}'
-            option='{"logo": "left"}'></page-top> -->
-        <page-nav-menu theme="dark" animation="slide" logo="path/to/logo.png" logo-position="left" items='[
+        <page-nav-menu theme="dark" animation="slide" logo="../assets/imgs/express_element-logo.png"
+            logo-position="left" items='[
                 {"text": "Home", "url": "#home"},
                 {"text": "Products", "submenu": [
                     {"text": "Category 1", "url": "#cat1"},
@@ -46,11 +45,11 @@
                         server-url="https://takenolab-ollama-server.18hbq0.easypanel.host/api/generate"></page-proofreader>
                 </Page-container>
 
-                <page-layout>
+                <page-container>
                     <page-ai-code-editor ai-type="openai" model="gpt-3.5-turbo"
                         server-url="https://api.openai.com/v1/chat/completions" language="javascript"
                         api-key="your-api-key-here"></page-ai-code-editor>
-                </page-layout>
+                </page-container>
         </page-container>
         <page-container>
 
