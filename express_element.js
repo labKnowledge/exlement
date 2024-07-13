@@ -1155,7 +1155,8 @@ class PageContentGenerator extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
         :host {
-          display: block;
+          display: flex;
+          flex-direction: column;
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
           max-width: 1200px;
           margin: 0 auto;
@@ -1163,12 +1164,12 @@ class PageContentGenerator extends HTMLElement {
           padding: 2rem;
           border-radius: 8px;
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          min-height: 600px;
         }
         .contentGen {
           display: flex;
           flex-wrap: wrap;
           gap: 2rem;
-          padding-bottom: 30px;
           height: 100%
         }
         .input-column, .output-column {
@@ -1177,10 +1178,11 @@ class PageContentGenerator extends HTMLElement {
           min-width: 300px;
           padding: 10px;
           flex-direction: column;
-          height: 100%
         }
         .output-column {
-          position: relative;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
         }
         .input-group {
           margin-bottom: 1.5rem;
@@ -1246,17 +1248,11 @@ class PageContentGenerator extends HTMLElement {
           border-radius: 4px;
           padding: 1rem;
           background-color: white;
-          max-height: 100%;
-          min-height: 600px;
           white-space: pre-wrap;
           font-size: 0.9rem;
           line-height: 1.5;
           box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-          position: absolute;
-          top: 10px;
-          bottom: 10px;
-          left: 10px;
-          right: 10px;
+          margin: 10px;
         }
         @media (max-width: 768px) {
           .contentGen {
@@ -1773,6 +1769,522 @@ class PageProofreader extends HTMLElement {
   }
 }
 
+class PageAICodeEditor extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this.aiType = "openai";
+    this.model = "";
+    this.serverUrl = "";
+    this.apiKey = "";
+    this.debounceTimeout = null;
+    this.language = "javascript";
+    this.editor = null;
+  }
+
+  static get observedAttributes() {
+    return ["ai-type", "model", "server-url", "language"];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    switch (name) {
+      case "ai-type":
+        this.aiType = newValue;
+        this.updateAITypeUI();
+        break;
+      case "model":
+        this.model = newValue;
+        break;
+      case "server-url":
+        this.serverUrl = newValue;
+        break;
+      case "language":
+        this.language = newValue;
+        this.updateEditorLanguage();
+        break;
+    }
+  }
+
+  connectedCallback() {
+    this.render();
+    this.setupCodeMirror();
+    this.setupEventListeners();
+  }
+
+  render() {
+    this.shadowRoot.innerHTML = `
+      <style>
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css');
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css');
+        :host {
+          display: block;
+          font-family: 'Roboto Mono', monospace;
+          max-width: 1200px;
+          margin: 2rem auto;
+        }
+        .editor-container {
+          display: flex;
+          flex-direction: column;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .editor-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.75rem 1rem;
+          background-color: #282a36;
+          color: #f8f8f2;
+        }
+        .language-select, .ai-type-select {
+          padding: 0.5rem;
+          border-radius: 4px;
+          background-color: #44475a;
+          color: #f8f8f2;
+          border: none;
+          font-size: 14px;
+        }
+        #api-key-input {
+          padding: 0.5rem;
+          border-radius: 4px;
+          background-color: #44475a;
+          color: #f8f8f2;
+          border: none;
+          font-size: 14px;
+          width: 200px;
+          margin-left: 0.5rem;
+        }
+        #code-editor {
+          width: 100%;
+          height: 400px;
+        }
+        .suggestions {
+          padding: 1rem;
+          background-color: #282a36;
+          color: #f8f8f2;
+          border-top: 1px solid #44475a;
+          max-height: 200px;
+          overflow-y: auto;
+        }
+        .suggestion {
+          margin-bottom: 0.75rem;
+          padding: 0.75rem;
+          background-color: #44475a;
+          border-radius: 4px;
+          font-size: 14px;
+        }
+        .error {
+          color: #ff5555;
+          font-weight: bold;
+        }
+        .btn {
+          background-color: #50fa7b;
+          color: #282a36;
+          border: none;
+          padding: 0.5rem 1rem;
+          border-radius: 4px;
+          font-size: 14px;
+          cursor: pointer;
+          transition: background-color 0.3s;
+          margin-left: 0.5rem;
+        }
+        .btn:hover {
+          background-color: #5af78e;
+        }
+        .preview-container {
+          background-color: #f8f8f2;
+          border-top: 1px solid #44475a;
+          padding: 1rem;
+        }
+        .preview-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 0.5rem;
+        }
+        #preview-frame {
+          width: 100%;
+          height: 300px;
+          border: none;
+          background-color: white;
+        }
+        #console-output {
+          width: 100%;
+          height: 300px;
+          background-color: #282a36;
+          color: #f8f8f2;
+          font-family: 'Roboto Mono', monospace;
+          padding: 0.5rem;
+          overflow-y: auto;
+          white-space: pre-wrap;
+        }
+      </style>
+      <div class="editor-container">
+        <div class="editor-header">
+          <div>
+            <select class="language-select">
+              <option value="javascript">JavaScript</option>
+              <option value="python">Python</option>
+              <option value="html">HTML</option>
+              <option value="css">CSS</option>
+            </select>
+            <select class="ai-type-select">
+              <option value="openai">OpenAI</option>
+              <option value="ollama">Ollama</option>
+            </select>
+            <input type="password" id="api-key-input" placeholder="API Key" style="display: none;">
+          </div>
+          <span>AI-Assisted Code Editor</span>
+          <div>
+            <button class="btn generate-btn">Generate Code</button>
+            <button class="btn run-btn">Run</button>
+          </div>
+        </div>
+        <textarea id="code-editor"></textarea>
+        <div class="suggestions"></div>
+        <div class="preview-container">
+          <div class="preview-header">
+            <h3>Preview</h3>
+            <button class="btn clear-btn">Clear</button>
+          </div>
+          <iframe id="preview-frame" style="display:none;"></iframe>
+          <pre id="console-output" style="display:none;"></pre>
+        </div>
+      </div>
+    `;
+  }
+
+  setupCodeMirror() {
+    const script = document.createElement("script");
+    script.src =
+      "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js";
+    script.onload = () => {
+      const modeScript = document.createElement("script");
+      modeScript.src = `https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/${this.language}/${this.language}.min.js`;
+      modeScript.onload = () => {
+        this.initializeCodeMirror();
+      };
+      document.head.appendChild(modeScript);
+    };
+    document.head.appendChild(script);
+  }
+
+  initializeCodeMirror() {
+    const textarea = this.shadowRoot.getElementById("code-editor");
+    this.editor = CodeMirror.fromTextArea(textarea, {
+      lineNumbers: true,
+      theme: "dracula",
+      mode: this.language,
+      autoCloseBrackets: true,
+      matchBrackets: true,
+      indentUnit: 2,
+      tabSize: 2,
+      indentWithTabs: false,
+      lineWrapping: true,
+    });
+
+    this.editor.on("change", () => {
+      clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = setTimeout(() => this.getAISuggestions(), 500);
+    });
+  }
+
+  updateEditorLanguage() {
+    if (this.editor) {
+      this.editor.setOption("mode", this.language);
+    }
+    this.updatePreviewVisibility();
+  }
+
+  updatePreviewVisibility() {
+    const previewFrame = this.shadowRoot.getElementById("preview-frame");
+    const consoleOutput = this.shadowRoot.getElementById("console-output");
+
+    if (
+      this.language === "javascript" ||
+      this.language === "html" ||
+      this.language === "css"
+    ) {
+      previewFrame.style.display = "block";
+      consoleOutput.style.display = "none";
+    } else {
+      previewFrame.style.display = "none";
+      consoleOutput.style.display = "block";
+    }
+  }
+
+  setupEventListeners() {
+    const languageSelect = this.shadowRoot.querySelector(".language-select");
+    const aiTypeSelect = this.shadowRoot.querySelector(".ai-type-select");
+    const apiKeyInput = this.shadowRoot.getElementById("api-key-input");
+    const generateBtn = this.shadowRoot.querySelector(".generate-btn");
+    const runBtn = this.shadowRoot.querySelector(".run-btn");
+    const clearBtn = this.shadowRoot.querySelector(".clear-btn");
+
+    languageSelect.addEventListener("change", (event) => {
+      this.language = event.target.value;
+      this.updateEditorLanguage();
+      this.getAISuggestions();
+    });
+
+    aiTypeSelect.addEventListener("change", (event) => {
+      this.aiType = event.target.value;
+      this.updateAITypeUI();
+    });
+
+    apiKeyInput.addEventListener("change", (event) => {
+      this.apiKey = event.target.value;
+    });
+
+    generateBtn.addEventListener("click", () =>
+      this.generateCodeFromComments()
+    );
+    runBtn.addEventListener("click", () => this.runCode());
+    clearBtn.addEventListener("click", () => this.clearPreview());
+  }
+
+  updateAITypeUI() {
+    const apiKeyInput = this.shadowRoot.getElementById("api-key-input");
+    if (this.aiType === "openai") {
+      apiKeyInput.style.display = "inline-block";
+    } else {
+      apiKeyInput.style.display = "none";
+    }
+  }
+
+  runCode() {
+    const code = this.editor.getValue();
+
+    if (this.language === "javascript") {
+      this.runJavaScript(code);
+    } else if (this.language === "html") {
+      this.runHTML(code);
+    } else if (this.language === "css") {
+      this.runCSS(code);
+    } else if (this.language === "python") {
+      this.runPython(code);
+    }
+  }
+
+  runJavaScript(code) {
+    const previewFrame = this.shadowRoot.getElementById("preview-frame");
+    previewFrame.srcdoc = `
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; }
+          </style>
+        </head>
+        <body>
+          <h1>JavaScript Output:</h1>
+          <div id="output"></div>
+          <script>
+            function log(message) {
+              const output = document.getElementById('output');
+              output.innerHTML += message + '<br>';
+            }
+            console.log = log;
+            console.error = log;
+            console.warn = log;
+            console.info = log;
+            try {
+              ${code}
+            } catch (error) {
+              log('Error: ' + error.message);
+            }
+          </script>
+        </body>
+      </html>
+    `;
+  }
+
+  runHTML(code) {
+    const previewFrame = this.shadowRoot.getElementById("preview-frame");
+    previewFrame.srcdoc = code;
+  }
+
+  runCSS(code) {
+    const previewFrame = this.shadowRoot.getElementById("preview-frame");
+    previewFrame.srcdoc = `
+      <html>
+        <head>
+          <style>${code}</style>
+        </head>
+        <body>
+          <h1>CSS Preview</h1>
+          <p>This is a paragraph to demonstrate text styling.</p>
+          <div class="example">This is a div with the class "example".</div>
+          <button>This is a button</button>
+        </body>
+      </html>
+    `;
+  }
+
+  runPython(code) {
+    const consoleOutput = this.shadowRoot.getElementById("console-output");
+    consoleOutput.textContent = "Python output (simulated):\n\n";
+    consoleOutput.textContent +=
+      "Note: This is a simulated output. For actual Python execution, you would need a backend service.\n\n";
+    consoleOutput.textContent += code;
+  }
+
+  clearPreview() {
+    const previewFrame = this.shadowRoot.getElementById("preview-frame");
+    const consoleOutput = this.shadowRoot.getElementById("console-output");
+    previewFrame.srcdoc = "";
+    consoleOutput.textContent = "";
+  }
+
+  async getAISuggestions() {
+    const suggestionsContainer = this.shadowRoot.querySelector(".suggestions");
+    const code = this.editor.getValue();
+
+    if (!code.trim()) {
+      suggestionsContainer.innerHTML = "";
+      return;
+    }
+
+    const prompt = `
+      Language: ${this.language}
+      Code:
+      ${code}
+
+      Provide the following:
+      1. Code completion suggestions
+      2. Potential errors or improvements
+      3. Brief explanation of a complex part (if any)
+
+      Format the response as JSON with the following structure:
+      {
+        "completions": ["suggestion1", "suggestion2", ...],
+        "errors": ["error1", "error2", ...],
+        "explanation": "Brief explanation here"
+      }
+    `;
+
+    try {
+      let response;
+      if (this.aiType === "ollama") {
+        response = await this.getOllamaSuggestions(prompt);
+      } else {
+        response = await this.getOpenAISuggestions(prompt);
+      }
+
+      const suggestions = JSON.parse(response);
+      this.renderSuggestions(suggestions);
+    } catch (error) {
+      console.error("Error getting AI suggestions:", error);
+      suggestionsContainer.innerHTML =
+        '<div class="error">Error getting AI suggestions. Please try again.</div>';
+    }
+  }
+
+  async generateCodeFromComments() {
+    const code = this.editor.getValue();
+    const comments = this.extractComments(code);
+
+    if (comments.length === 0) {
+      alert("Please add comments to generate code.");
+      return;
+    }
+
+    const prompt = `
+      Language: ${this.language}
+      Comments:
+      ${comments.join("\n")}
+
+      Generate code based on these comments. Format the response as a string containing only the generated code.
+    `;
+
+    try {
+      let response;
+      if (this.aiType === "ollama") {
+        response = await this.getOllamaSuggestions(prompt);
+      } else {
+        response = await this.getOpenAISuggestions(prompt);
+      }
+
+      this.editor.setValue(response);
+    } catch (error) {
+      console.error("Error generating code:", error);
+      alert("Error generating code. Please try again.");
+    }
+  }
+
+  extractComments(code) {
+    const commentRegex = /\/\/.*$|\/\*[\s\S]*?\*\//gm;
+    return code.match(commentRegex) || [];
+  }
+
+  async getOllamaSuggestions(prompt) {
+    const response = await fetch(this.serverUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: this.model,
+        prompt: prompt,
+      }),
+    });
+
+    const data = await response.json();
+    return data.response;
+  }
+
+  async getOpenAISuggestions(prompt) {
+    if (!this.apiKey) {
+      throw new Error("API key is required for OpenAI");
+    }
+
+    const response = await fetch(this.serverUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: this.model,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+  }
+
+  renderSuggestions(suggestions) {
+    const suggestionsContainer = this.shadowRoot.querySelector(".suggestions");
+    suggestionsContainer.innerHTML = "";
+
+    if (suggestions.completions && suggestions.completions.length > 0) {
+      const completionsElement = document.createElement("div");
+      completionsElement.innerHTML = "<strong>Suggestions:</strong>";
+      completionsElement.innerHTML += suggestions.completions
+        .map((suggestion) => `<div class="suggestion">${suggestion}</div>`)
+        .join("");
+      suggestionsContainer.appendChild(completionsElement);
+    }
+
+    if (suggestions.errors && suggestions.errors.length > 0) {
+      const errorsElement = document.createElement("div");
+      errorsElement.innerHTML = "<strong>Potential issues:</strong>";
+      errorsElement.innerHTML += suggestions.errors
+        .map((error) => `<div class="suggestion error">${error}</div>`)
+        .join("");
+      suggestionsContainer.appendChild(errorsElement);
+    }
+
+    if (suggestions.explanation) {
+      const explanationElement = document.createElement("div");
+      explanationElement.innerHTML = `<strong>Explanation:</strong><div class="suggestion">${suggestions.explanation}</div>`;
+      suggestionsContainer.appendChild(explanationElement);
+    }
+  }
+}
+
+customElements.define("page-ai-code-editor", PageAICodeEditor);
 customElements.define("page-proofreader", PageProofreader);
 customElements.define("page-content-generator", PageContentGenerator);
 customElements.define("page-chat", PageChat);

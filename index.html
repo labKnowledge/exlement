@@ -5,8 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Interesting App</title>
-    <link rel="stylesheet" href="/aipagecraft.css">
-    <script src="/aipagecraft.js">
+    <link rel="stylesheet" href="/express_element.css">
+    <script src="/express_element.js">
 
     </script>
 </head>
@@ -45,6 +45,12 @@
                     <page-proofreader ai-type="ollama" model="llama3"
                         server-url="https://takenolab-ollama-server.18hbq0.easypanel.host/api/generate"></page-proofreader>
                 </Page-container>
+
+                <page-layout>
+                    <page-ai-code-editor ai-type="openai" model="gpt-3.5-turbo"
+                        server-url="https://api.openai.com/v1/chat/completions" language="javascript"
+                        api-key="your-api-key-here"></page-ai-code-editor>
+                </page-layout>
         </page-container>
         <page-container>
 
