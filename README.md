@@ -33,7 +33,9 @@ You can include ExpressElement in your project via CDN:
 ```
 
 ## Quick Start
-copy and paste this in html file and your ready
+Copy and paste this into an HTML file and you're ready.
+
+Basic Page
 ```html
 <!DOCTYPE html>
 <html lang="en">
