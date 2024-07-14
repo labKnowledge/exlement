@@ -30,19 +30,18 @@
             <page-content level="7" text="This is another paragraph."></page-content>
             <page-layout column="1">
                 <page-container>
-                    <page-content-generator
-                        server-url="https://takenolab-ollama-server.18hbq0.easypanel.host/api/generate" ai-type="ollama"
-                        model="llama3">
+                    <page-content-generator server-url="https://api.openai.com/v1/chat/completions" ai-type="openai"
+                        model="gpt-3.5-turbo">
                     </page-content-generator>
                 </page-container>
                 <page-container>
-                    <page-chat server-url="https://takenolab-ollama-server.18hbq0.easypanel.host/api/chat"
-                        chat-type="ollama" model="llama3">
+                    <page-chat server-url="https://api.openai.com/v1/chat/completions" chat-type="openai"
+                        model="gpt-3.5-turbo">
                     </page-chat>
                 </page-container>
                 <Page-container>
-                    <page-proofreader ai-type="ollama" model="llama3"
-                        server-url="https://takenolab-ollama-server.18hbq0.easypanel.host/api/generate"></page-proofreader>
+                    <page-proofreader ai-type="openai" model="gpt-3.5-turbo"
+                        server-url="https://api.openai.com/v1/chat/completions"></page-proofreader>
                 </Page-container>
 
                 <page-container>
@@ -119,5 +118,10 @@
         <page-bottom data='{"copyright": "ours", "links": ["about us", "contact us"]}'></page-bottom>
     </page-base>
 </body>
+<script>
+    window.EXLEMENT_CONFIG = {
+        OPENAI_API_KEY: 'sk-None-fuZS7SbN5l0ngWRgX5znT3BlbkFJHX8X0Xs11b6CvW35KIzn'
+    };
+</script>
 
 </html>

@@ -956,9 +956,67 @@ class PageChat extends HTMLElement {
 
       if (this.chatType === "ollama") {
         await this.sendOllamaMessage(message);
+      } else if (this.chatType === "openai") {
+        await this.sendOpenAIMessage(message);
       } else {
         await this.sendDefaultMessage(message);
       }
+    }
+  }
+
+  async sendOpenAIMessage(message) {
+    try {
+      const response = await fetch(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${window.EXLEMENT_CONFIG.OPENAI_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: this.model,
+            messages: [{ role: "user", content: message }],
+            stream: true,
+          }),
+        }
+      );
+
+      const reader = response.body.getReader();
+      let assistantMessage = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        // Decode the stream
+        const chunk = new TextDecoder().decode(value);
+        const lines = chunk.split("\n");
+
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            const jsonString = line.slice(6); // Remove 'data: ' prefix
+            if (jsonString.trim() === "[DONE]") {
+              break;
+            }
+            try {
+              const parsedData = JSON.parse(jsonString);
+              const contentDelta = parsedData.choices[0].delta.content;
+              if (contentDelta) {
+                assistantMessage += contentDelta;
+                this.updateAssistantMessage(assistantMessage);
+              }
+            } catch (e) {
+              console.error("Error parsing JSON:", e);
+            }
+          }
+        }
+      }
+
+      this.messages.push({ text: assistantMessage, type: "server" });
+      this.updateChatMessages();
+    } catch (error) {
+      console.error("Error sending OpenAI message:", error);
     }
   }
 
@@ -1180,6 +1238,7 @@ class PageContentGenerator extends HTMLElement {
           flex-direction: column;
         }
         .output-column {
+          position: relative;
           flex: 1;
           display: flex;
           flex-direction: column;
@@ -1242,6 +1301,7 @@ class PageContentGenerator extends HTMLElement {
           transform: translateY(1px);
         }
         .output {
+          position: relative;
           flex: 1;
           overflow-y: auto;
           border: 1px solid #ddd;
@@ -1326,8 +1386,9 @@ class PageContentGenerator extends HTMLElement {
           <button id="generate">Generate Content</button>
         </div>
         <div class="output-column">
-          <div class="output" id="output"></div>
-          <span class="copy-get-text-button" id="copyButton" title="Copy to clipboard">📋</span>
+            <div class="output" id="output"></div>
+            <span class="copy-get-text-button" id="copyButton" title="Copy to clipboard">📋</span>
+         
         </div>
       </div>
     `;
@@ -1447,7 +1508,7 @@ class PageContentGenerator extends HTMLElement {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${window.EXLEMENT_CONFIG.OPENAI_API_KEY}`,
         },
         body: JSON.stringify({
           model: this.model,
@@ -1714,7 +1775,7 @@ class PageProofreader extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${this.apiKey}`,
+        Authorization: `Bearer ${window.EXLEMENT_CONFIG.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
         model: this.model,
