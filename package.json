@@ -1,6 +1,6 @@
 {
   "name": "exlement",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Exlement.js is a revolutionary web development framework that extends web components  with powerful, ready to use, AI-ready custom elements. Build sophisticated websites and applications with the simplicity of writing HTML tags.",
   "main": "exlement.js",
   "directories": {
