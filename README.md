@@ -1,6 +1,6 @@
 # Exlement
 
-![Exlement Logo](assets/imgs/express_element-logo.png)
+![Exlement Logo](assets/imgs/express_element-logo.jpeg)
 
 Exlement.js is a revolutionary web development framework that extends HTML with powerful, AI-ready custom elements. Build sophisticated websites and applications with the simplicity of writing HTML tags.
 
