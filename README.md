@@ -8,11 +8,9 @@ Exlement.js is a revolutionary web development framework that extends HTML with 
 
 - [Features](#features)
 - [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Documentation](#documentation)
-- [Examples](#examples)
-- [Contributing](#contributing)
-- [License](#license)
+- [Quick Start](docs/README.md)
+- [Documentation](docs/README.md)
+- [Examples](docs/api-reference.md)
 
 ## Features
 
