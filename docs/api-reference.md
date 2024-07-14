@@ -157,6 +157,15 @@ Quick reference guide for Exlement components and their attributes:
         </page-ai-code-editor>
     ```
 
+Open AI Key  
+```html
+<script>
+    window.EXLEMENT_CONFIG = {
+        OPENAI_API_KEY: 'your key goes here'
+    };
+</script>
+```
+
 Usage Example:
 ```html
 <page-layout column="2" options="{'size': 'side-bar-left'}">
