@@ -1,37 +1,3 @@
-// import { PageBase } from "./src/components/PageBase";
-// import { PageCard } from "./src/components/PageCard,js";
-// import { PageTop } from "./src/components/PageTop";
-// import { PageAICodeEditor } from "./src/components/PageAICodeEditor";
-// import { PageBottom } from "./src/components/PageBottom,js";
-// import { PageCardLayout } from "./src/components/PageCardLayout";
-// import { PageChat } from "./src/components/PageChat";
-// import { PageColumn } from "./src/components/PageColumn";
-// import { PageContainer } from "./src/components/PageContainer";
-// import { PageContent } from "./src/components/PageContent";
-// import { PageContentGenerator } from "./src/components/PageContentGenerator";
-// import { PageImageGallery } from "./src/components/PageImageGallery";
-// import { PageLayout } from "./src/components/PageLayout";
-// import { PageNavMenu } from "./src/components/PageNavMenu";
-// import { PageProofreader } from "./src/components/PageProofreader";
-// import { PageTabs } from "./src/components/PageTabs";
-
-// module.exports = "./src/components/PageBase";
-// module.exports = "./src/components/PageCard,js";
-// module.exports = "./src/components/PageTop";
-// module.exports = "./src/components/PageAICodeEditor";
-// module.exports = "./src/components/PageBottom,js";
-// module.exports = "./src/components/PageCardLayout";
-// module.exports = "./src/components/PageChat";
-// module.exports = "./src/components/PageColumn";
-// module.exports = "./src/components/PageContainer";
-// module.exports = "./src/components/PageContent";
-// module.exports = "./src/components/PageContentGenerator";
-// module.exports = "./src/components/PageImageGallery";
-// module.exports = "./src/components/PageLayout";
-// module.exports = "./src/components/PageNavMenu";
-// module.exports = "./src/components/PageProofreader";
-// module.exports = "./src/components/PageTabs";
-
 class PageBase extends HTMLElement {
   connectedCallback() {
     // No need to render anything, just act as a container
