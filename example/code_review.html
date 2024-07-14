@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exlement Demo</title>
+    <link rel="stylesheet" href="https://labknowledge.github.io/exlement/assets/css/exlement.css" />
+    <script src="https://labknowledge.github.io/exlement/exlement.js"></script>
+</head>
+
+<body>
+    <page-base>
+        <page-top
+            data="{'logo': '../assets/imgs/express_element-logo.jpeg', 'links': ['Home', 'About', 'Contact']}"></page-top>
+        <page-container>
+            <page-ai-code-editor ai-type="openai" model="gpt-3.5-turbo"
+                server-url="https://api.openai.com/v1/chat/completions" language="javascript"
+                api-key="your-api-key-here"></page-ai-code-editor>
+        </page-container>
+
+        <page-bottom data="{'copyright': '2024 Exlement', 'links': ['Privacy', 'Terms']}"></page-bottom>
+    </page-base>
+    <script>
+        window.EXLEMENT_CONFIG = {
+            OPENAI_API_KEY: 'your key goes here'
+        };
+    </script>
+</body>
+
+</html>

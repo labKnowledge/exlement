@@ -17,8 +17,8 @@ Welcome to the Exlement documentation. Exlement is a revolutionary web developme
 Include Exlement in your project via CDN:
 
 ```html
-<link rel="stylesheet" href="https://cdn.exlement.com/assets/css/exlement.css">
-<script src="https://cdn.exlement.com/assets/js/exlement.js"></script>
+<link rel="stylesheet" href="https://labknowledge.github.io/exlement/assets/css/exlement.css">
+<script src="https://labknowledge.github.io/exlement/exlement.js"></script>
 ```
 
 

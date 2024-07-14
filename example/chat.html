@@ -14,25 +14,17 @@
         <page-top
             data="{'logo': '../assets/imgs/express_element-logo.jpeg', 'links': ['Home', 'About', 'Contact']}"></page-top>
         <page-container>
-
-            <page-content level="1" text="Welcome to Exlement"></page-content>
-            <page-layout column="2">
-                <page-content level="7"
-                    text="Build websites faster than ever with custom HTML elements! "></page-content>
-
-                <page-content level="7"
-                    text="If not grouped by page container they are treated individually"></page-content>
-
-            </page-layout>
-            <page-layout column="3">
-                <page-column>Column 1 content</page-column>
-                <page-column>Column 2 content</page-column>
-                <page-column>Column 3 content</page-column>
-            </page-layout>
+            <page-chat server-url="https://api.openai.com/v1/chat/completions" chat-type="openai" model="gpt-3.5-turbo">
+            </page-chat>
         </page-container>
 
         <page-bottom data="{'copyright': '2024 Exlement', 'links': ['Privacy', 'Terms']}"></page-bottom>
     </page-base>
+    <script>
+        window.EXLEMENT_CONFIG = {
+            OPENAI_API_KEY: 'your key goes here'
+        };
+    </script>
 </body>
 
 </html>
