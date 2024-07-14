@@ -1,3 +1,4 @@
+![Exlement Logo](/assets/imgs/express_element-logo.jpeg)
 # Core Concepts
 
 ## Table of Contents

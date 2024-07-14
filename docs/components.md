@@ -1,3 +1,4 @@
+![Exlement Logo](/assets/imgs/express_element-logo.jpeg)
 # Components
 
 ## Table of Contents

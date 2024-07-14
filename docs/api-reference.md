@@ -1,3 +1,4 @@
+![Exlement Logo](/assets/imgs/express_element-logo.jpeg)
 # API Reference
 
 ## Table of Contents
