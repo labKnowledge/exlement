@@ -28,8 +28,8 @@ Exlement.js is a revolutionary web development framework that extends HTML with 
 You can include ExpressElement in your project via CDN:
 
 ```html
-<script src="https://labknowledge.github.io/exlement/exlement.js"></script>
-<link rel="stylesheet" href="https://labknowledge.github.io/exlement/assets/css/exlement.css">
+<link rel="stylesheet" href="https://unpkg.com/exlement@1.0.0/assets/css/exlement.css">
+<script src="https://unpkg.com/exlement@1.0.0/exlement.js"></script>
 ```
 
 ## Quick Start
@@ -44,8 +44,8 @@ Basic Page
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exlement Quick Start</title>
-    <link rel="stylesheet" href="https://labknowledge.github.io/exlement/assets/css/exlement.css">
-    <script src="https://labknowledge.github.io/exlement/exlement.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/exlement@1.0.0/assets/css/exlement.css">
+    <script src="https://unpkg.com/exlement@1.0.0/exlement.js"></script>
 </head>
 
 <body>
@@ -85,8 +85,8 @@ Basic Page
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exlement Demo</title>
-    <link rel="stylesheet" href="https://labknowledge.github.io/exlement/assets/css/exlement.css">
-    <script src="https://labknowledge.github.io/exlement/exlement.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/exlement@1.0.0/assets/css/exlement.css">
+    <script src="https://unpkg.com/exlement@1.0.0/exlement.js"></script>
 </head>
 
 <body>
@@ -121,8 +121,8 @@ Basic Page
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exlement Demo</title>
-    <link rel="stylesheet" href="https://labknowledge.github.io/exlement/assets/css/exlement.css">
-    <script src="https://labknowledge.github.io/exlement/exlement.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/exlement@1.0.0/assets/css/exlement.css">
+    <script src="https://unpkg.com/exlement@1.0.0/exlement.js"></script>
 </head>
 
 <body>
