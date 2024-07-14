@@ -5,8 +5,6 @@
 1. [Core Concepts](core-concepts.md)
 2. [Components](components.md)
 3. [Layouts](layouts.md)
-4. [AI Integration](ai-integration.md)
-5. [Styling](styling.md)
 6. [API Reference](api-reference.md)
 
 Learn how to create responsive layouts using Exlement:

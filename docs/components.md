@@ -5,8 +5,6 @@
 1. [Core Concepts](core-concepts.md)
 2. [Components](components.md)
 3. [Layouts](layouts.md)
-4. [AI Integration](ai-integration.md)
-5. [Styling](styling.md)
 6. [API Reference](api-reference.md)
 
 Exlement provides a wide range of pre-built components to accelerate your development:
@@ -19,7 +17,7 @@ Exlement provides a wide range of pre-built components to accelerate your develo
    - Customization options
    - Responsive behavior
 
-3. `<page-container>`: A container for your main content
+3. `<page-container>`: A container for all your content
    - Layout options
    - Nesting capabilities
 
@@ -28,15 +26,16 @@ Exlement provides a wide range of pre-built components to accelerate your develo
    - Responsive breakpoints
 
 5. `<page-content>`: For text content at various heading levels
-   - Content levels
-   - Styling options
+   - Content levels 
+      - `1 - 6` - heading  
+      - `7` - paragraph
+      - `8` - span like for inline content
 
 6. `<page-bottom>`: Creates a customizable footer
    - Customization options
-   - Social media integration
 
 7. `<page-nav-menu>`: Navigation menu component
-   - Menu structure
+   - Menu structure refere to api reference
    - Dropdown capabilities
 
 8. `<page-card>`: Card component for displaying grouped content
