@@ -35,7 +35,8 @@ You can include ExpressElement in your project via CDN:
 ## Quick Start
 Copy and paste this into an HTML file and you're ready.
 
-Basic Page
+**Basic Page**
+![reviewEditorAI](/assets/imgs/basic.png)
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -77,6 +78,7 @@ Basic Page
 ```
 
 **Chat**
+![reviewEditorAI](/assets/imgs/chat_component.png)
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -113,6 +115,7 @@ Basic Page
 
 
 **AI Code Reviewer and Editor**
+![reviewEditorAI](/assets/imgs/code_review.png)
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -152,3 +155,7 @@ Basic Page
 - [advance](/example/index.html)
 - [chat](/example/chat.html)
 - [code nalyzer and editor](/example/code_review.html)
+
+
+## All components together
+![fullComponents](/assets/imgs/all_component_together.png)
