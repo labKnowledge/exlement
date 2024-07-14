@@ -28,5 +28,5 @@ Exlement.js is a revolutionary web development framework that extends HTML with 
 You can include ExpressElement in your project via CDN:
 
 ```html
-<script src="https://cdn.exlement.com/expresselement.min.js"></script>
-<link rel="stylesheet" href="https://cdn.exlement.com/expresselement.min.css">
+<script src="https://cdn.exlement.com/exlement.min.js"></script>
+<link rel="stylesheet" href="https://cdn.exlement.com/exlement.min.css">
