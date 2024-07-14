@@ -1,0 +1,64 @@
+{
+  "name": "exlement",
+  "version": "1.0.0",
+  "description": "Exlement.js is a revolutionary web development framework that extends web components  with powerful, ready to use, AI-ready custom elements. Build sophisticated websites and applications with the simplicity of writing HTML tags.",
+  "main": "exlement.js",
+  "directories": {
+    "doc": "docs",
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/labKnowledge/exlement.git"
+  },
+  "keywords": [
+    "Web Components",
+    "Custom Elements",
+    "Shadow DOM",
+    "HTML",
+    "Templates",
+    "Modern",
+    "HTML",
+    "Encapsulated",
+    "Styling",
+    "Reusable",
+    "Components",
+    "Component-Based",
+    "Architecture",
+    "Native",
+    "Browser",
+    "Support",
+    "Framework-Agnostic",
+    "Modular",
+    "Web",
+    "Development",
+    "Declarative",
+    "Syntax",
+    "AI-Ready",
+    "Components",
+    "Rapid",
+    "Prototyping",
+    "HTML",
+    "Evolution",
+    "Interoperable",
+    "Web",
+    "Parts",
+    "Scoped",
+    "CSS",
+    "Component",
+    "Lifecycle",
+    "Browser-Native",
+    "Technology",
+    "Standards-Based",
+    "Development"
+  ],
+  "author": "gakwaya",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/labKnowledge/exlement/issues"
+  },
+  "homepage": "https://github.com/labKnowledge/exlement#readme"
+}
