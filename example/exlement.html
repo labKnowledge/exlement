@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exlement - Revolutionizing Web Development</title>
+    <link rel="stylesheet" href="../assets/css/exlement.css">
+    <script src="../exlement.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
+        }
+    </style>
+</head>
+
+<body>
+    <page-base>
+        <page-top
+            data="{'logo': 'https://unpkg.com/exlement@1.0.0/assets/imgs/express_element-logo.jpeg', 'links': [{'url':'/','text':'Home'}, {'text':'Components', 'url':'#'}, {'text':'Benefits', 'url':'#'}, {'text':'Get Started', 'url':'#'}]}"
+            option="{'logo': 'left', 'bgColor': '#2c3e50', 'textColor': '#ecf0f1'}"></page-top>
+
+        <page-container>
+            <page-heading subtitle="Revolutionizing Web Development" title="Welcome to Exlement"
+                text="Exlement is a cutting-edge web development framework that extends HTML with powerful, AI-ready custom elements. Build sophisticated websites and applications with the simplicity of writing HTML tags."
+                bg-color="#3498db" subtitle-color="#ecf0f1" title-color="#ffffff" text-color="#ecf0f1"
+                padding="4rem 2rem"></page-heading>
+
+            <page-layout column="1" options="{'gutter': '2rem', 'spacing': '2rem'}">
+                <page-image-content
+                    data="{'image': 'https://unpkg.com/exlement@1.0.2/assets/imgs/code_review.png', 'title': 'AI-Powered Development', 'content': 'Exlement integrates AI capabilities directly into your HTML structure, enabling intelligent code suggestions, automated proofreading, and dynamic content generation.'}"
+                    option="{'imagePosition': 'left'}"></page-image-content>
+                <page-image-content
+                    data="{'image': 'https://unpkg.com/exlement@1.0.2/assets/imgs/chat_component.png', 'title': 'Interactive Components', 'content': 'Create engaging user experiences with built-in interactive elements like chat interfaces, AI code editors, and dynamic layouts - all with simple HTML-like syntax.'}"
+                    option="{'imagePosition': 'right'}"></page-image-content>
+            </page-layout>
+
+            <page-heading subtitle="Key Components" title="Powerful Building Blocks"
+                text="Exlement offers a wide range of components to accelerate your web development process. Here are some of our standout features:"
+                padding="4rem 2rem 2rem"></page-heading>
+
+            <page-card-layout columns="3" min-card-width="250px">
+                <page-card>
+                    <h3>AI Code Editor</h3>
+                    <p>Intelligent code suggestions and real-time error detection powered by AI.</p>
+                </page-card>
+                <page-card>
+                    <h3>Chat Component</h3>
+                    <p>Easily integrate AI-powered chat functionality into your applications.</p>
+                </page-card>
+                <page-card>
+                    <h3>Content Generator</h3>
+                    <p>Create dynamic content with AI assistance for various types of web copy.</p>
+                </page-card>
+                <page-card>
+                    <h3>Image Gallery</h3>
+                    <p>Responsive and customizable image galleries with built-in lazy loading.</p>
+                </page-card>
+                <page-card>
+                    <h3>Flexible Layouts</h3>
+                    <p>Create complex, responsive layouts with simple HTML-like syntax.</p>
+                </page-card>
+                <page-card>
+                    <h3>Proofreader</h3>
+                    <p>AI-powered proofreading to ensure high-quality content across your site.</p>
+                </page-card>
+            </page-card-layout>
+
+            <page-heading subtitle="Why Choose Exlement?" title="Benefits for Developers"
+                text="Exlement empowers developers to create sophisticated web applications faster and more efficiently than ever before."
+                padding="4rem 2rem 2rem"></page-heading>
+
+            <page-layout column="2" options="{'gutter': '2rem', 'spacing': '2rem'}">
+                <page-product-info
+                    data="{'image': 'https://unpkg.com/exlement@1.0.2/assets/imgs/basic.png', 'title': 'Rapid Development', 'text': 'Build feature-rich web applications in record time with our intuitive, HTML-like syntax and pre-built components.', 'buttonText': 'Learn More'}"
+                    option="{'layout': 'vertical', 'bgColor': '#ffffff', 'textColor': '#333333', 'buttonColor': '#3498db', 'buttonTextColor': '#ffffff'}"></page-product-info>
+                <page-product-info
+                    data="{'image': 'https://unpkg.com/exlement@1.0.2/assets/imgs/code_review.png', 'title': 'AI Integration', 'text': 'Harness the power of AI in your web projects with built-in machine learning capabilities and intelligent assistants.', 'buttonText': 'Explore AI Features'}"
+                    option="{'layout': 'vertical', 'bgColor': '#ffffff', 'textColor': '#333333', 'buttonColor': '#3498db', 'buttonTextColor': '#ffffff'}"></page-product-info>
+            </page-layout>
+
+            <page-testimonial
+                data="{'image': 'https://unpkg.com/exlement@1.0.0/assets/imgs/express_element-logo.jpeg', 'quote': 'Exlement has transformed our development process. We're building sophisticated web applications faster than ever, and the AI-powered components have significantly improved our productivity.', 'name': 'Jane Doe', 'role': 'Senior Web Developer'}"
+                theme="light" bg-color="#ecf0f1"></page-testimonial>
+
+        </page-container>
+
+        <page-bottom data="{'copyright': '2024 Exlement', 'links': ['Privacy', 'Terms', 'Contact']}"
+            option="{'bgColor': '#2c3e50', 'textColor': '#ecf0f1', 'align': 'center'}"></page-bottom>
+    </page-base>
+</body>
+
+</html>

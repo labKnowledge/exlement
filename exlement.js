@@ -19,11 +19,18 @@ class PageTop extends HTMLElement {
     const config = JSON.parse(dataAttr.replace(/'/g, '"'));
     const option = optionAttr
       ? JSON.parse(optionAttr.replace(/'/g, '"'))
-      : { logo: "left" };
+      : { logo: "left", bgColor: "#f8f9fa", textColor: "#333" };
 
     const logoHtml = `<img src="${config.logo}" alt="Logo">`;
     const navHtml = `<nav>${config.links
-      .map((link) => `<a href="#">${link}</a>`)
+      .map((link) => {
+        if (typeof link === "string") {
+          return `<a href="#">${link}</a>`;
+        } else if (typeof link === "object" && link.text && link.url) {
+          return `<a href="${link.url}">${link.text}</a>`;
+        }
+        return "";
+      })
       .join("")}</nav>`;
 
     let content;
@@ -48,6 +55,14 @@ class PageTop extends HTMLElement {
     }
 
     this.innerHTML = content;
+    this.style.backgroundColor = option.bgColor || "#f8f9fa";
+    this.style.color = option.textColor || "#333";
+
+    // Apply text color to links
+    const links = this.querySelectorAll("a");
+    links.forEach((link) => {
+      link.style.color = option.textColor || "#333";
+    });
   }
 }
 
@@ -652,11 +667,30 @@ class PageLayout extends HTMLElement {
 
   render() {
     const columns = this.getAttribute("column") || "2";
-    const optionsAttr = this.getAttribute("options") || "{}";
-    const options = JSON.parse(optionsAttr.replace(/'/g, '"'));
+    const optionsAttr = this.getAttribute("options");
+    const customCssAttr = this.getAttribute("custom-css");
+
+    // Default options
+    const defaultOptions = {
+      size: "same",
+      gutter: "1rem",
+      spacing: "1rem",
+      padding: "0",
+    };
+
+    // Merge default options with user-provided options
+    const options = optionsAttr
+      ? { ...defaultOptions, ...JSON.parse(optionsAttr.replace(/'/g, '"')) }
+      : defaultOptions;
+
+    const customCss = customCssAttr
+      ? JSON.parse(customCssAttr.replace(/'/g, '"'))
+      : {};
 
     this.style.display = "grid";
-    this.style.gap = "1rem";
+    this.style.columnGap = options.gutter;
+    this.style.rowGap = options.spacing;
+    this.style.padding = options.padding;
 
     let templateColumns;
     switch (options.size) {
@@ -674,6 +708,11 @@ class PageLayout extends HTMLElement {
     }
 
     this.style.gridTemplateColumns = templateColumns;
+
+    // Apply custom CSS
+    Object.keys(customCss).forEach((property) => {
+      this.style[property] = customCss[property];
+    });
 
     const mediaQuery = window.matchMedia("(max-width: 768px)");
     const handleMediaQuery = (e) => {
@@ -1762,6 +1801,7 @@ class PageChat extends HTMLElement {
       });
   }
 }
+
 class PageCardLayout extends HTMLElement {
   connectedCallback() {
     this.render();
@@ -1798,6 +1838,7 @@ class PageCardLayout extends HTMLElement {
     resizeObserver.observe(this);
   }
 }
+
 class PageCard extends HTMLElement {
   connectedCallback() {
     this.style.border = "1px solid #ddd";
@@ -1814,21 +1855,526 @@ class PageBottom extends HTMLElement {
 
   render() {
     const dataAttr = this.getAttribute("data");
+    const optionAttr = this.getAttribute("option");
     if (!dataAttr) {
       console.error("No data attribute provided for page-bottom");
       return;
     }
     const config = JSON.parse(dataAttr.replace(/'/g, '"'));
+    const option = optionAttr
+      ? JSON.parse(optionAttr.replace(/'/g, '"'))
+      : {
+          bgColor: "#f8f9fa",
+          textColor: "#333",
+          align: "center",
+          font: "Arial, sans-serif",
+        };
+
+    const copyright = `<p class="copyright">&copy; ${config.copyright}</p>`;
+    const navHtml = `<nav>${config.links
+      .map((link) => {
+        if (typeof link === "string") {
+          return `<a href="#">${link}</a>`;
+        } else if (typeof link === "object" && link.text && link.url) {
+          return `<a href="${link.url}">${link.text}</a>`;
+        }
+        return "";
+      })
+      .join("")}</nav>`;
+
     this.innerHTML = `
-                    <p>&copy; ${config.copyright}</p>
-                    <nav>
-                        ${config.links
-                          .map((link) => `<a href="#">${link}</a>`)
-                          .join("")}
-                    </nav>
-                `;
+      <div class="footer-content">
+        ${copyright}
+        ${navHtml}
+      </div>
+    `;
+
+    // Apply styles to the component
+    this.style.backgroundColor = option.bgColor || "#f8f9fa";
+    this.style.color = option.textColor || "#333";
+    this.style.padding = "1rem";
+    this.style.fontFamily = option.font || "Arial, sans-serif";
+
+    // Apply alignment and styling
+    const footerContent = this.querySelector(".footer-content");
+    footerContent.style.display = "flex";
+    footerContent.style.flexDirection =
+      option.align === "center" ? "column" : "row";
+    footerContent.style.alignItems =
+      option.align === "center" ? "center" : "baseline";
+    footerContent.style.justifyContent =
+      option.align === "right"
+        ? "flex-end"
+        : option.align === "center"
+        ? "center"
+        : "space-between";
+
+    // Style the copyright
+    const copyrightElement = this.querySelector(".copyright");
+    copyrightElement.style.margin = "0";
+    copyrightElement.style.marginRight =
+      option.align !== "center" ? "1rem" : "0";
+
+    // Style the nav
+    const nav = this.querySelector("nav");
+    nav.style.display = "flex";
+    nav.style.flexWrap = "wrap";
+    nav.style.justifyContent =
+      option.align === "center" ? "center" : "flex-start";
+    nav.style.marginTop = option.align === "center" ? "0.5rem" : "0";
+
+    // Apply text color and font to links
+    const links = this.querySelectorAll("a");
+    links.forEach((link) => {
+      link.style.color = option.textColor || "#333";
+      link.style.marginLeft = "0.5rem";
+      link.style.marginRight = "0.5rem";
+      link.style.textDecoration = "none";
+      link.style.fontFamily = option.font || "Arial, sans-serif";
+    });
   }
 }
+
+class PageImageContent extends HTMLElement {
+  connectedCallback() {
+    this.render();
+  }
+
+  render() {
+    const dataAttr = this.getAttribute("data");
+    const optionAttr = this.getAttribute("option");
+    if (!dataAttr) {
+      console.error("No data attribute provided for page-image-content");
+      return;
+    }
+    const data = JSON.parse(dataAttr.replace(/'/g, '"'));
+    const option = optionAttr
+      ? JSON.parse(optionAttr.replace(/'/g, '"'))
+      : { imagePosition: "left" };
+
+    const imageHtml = `<div class="image-container"><img src="${data.image}" alt="Content Image"></div>`;
+    const contentHtml = `
+      <div class="content-container">
+        ${data.title ? `<h2>${data.title}</h2>` : ""}
+        <p>${data.content}</p>
+      </div>
+    `;
+
+    this.innerHTML = `
+      <div class="image-content-wrapper">
+        ${imageHtml}
+        ${contentHtml}
+      </div>
+    `;
+
+    this.style.cssText = `
+      display: block;
+      font-family: Arial, sans-serif;
+      margin: 20px 0;
+    `;
+
+    const wrapper = this.querySelector(".image-content-wrapper");
+    wrapper.style.cssText = `
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-direction: ${
+        option.imagePosition === "right" ? "row-reverse" : "row"
+      };
+    `;
+
+    const imageContainer = this.querySelector(".image-container");
+    imageContainer.style.cssText = `
+      flex: 1;
+      max-width: 50%;
+    `;
+
+    const image = this.querySelector("img");
+    image.style.cssText = `
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      border-radius: 8px;
+    `;
+
+    const contentContainer = this.querySelector(".content-container");
+    contentContainer.style.cssText = `
+      flex: 1;
+    `;
+
+    const title = this.querySelector("h2");
+    if (title) {
+      title.style.cssText = `
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 24px;
+        color: #333;
+      `;
+    }
+
+    const content = this.querySelector("p");
+    content.style.cssText = `
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.5;
+      color: #666;
+    `;
+
+    // Add media query for responsiveness
+    const mediaQuery = window.matchMedia("(max-width: 768px)");
+    const handleMediaQueryChange = (e) => {
+      if (e.matches) {
+        // Mobile styles
+        wrapper.style.flexDirection = "column";
+        imageContainer.style.maxWidth = "100%";
+        imageContainer.style.marginBottom = "20px";
+        contentContainer.style.width = "100%";
+        if (title) {
+          title.style.fontSize = "20px";
+        }
+        content.style.fontSize = "14px";
+      } else {
+        // Desktop styles
+        wrapper.style.flexDirection =
+          option.imagePosition === "right" ? "row-reverse" : "row";
+        imageContainer.style.maxWidth = "50%";
+        imageContainer.style.marginBottom = "0";
+        contentContainer.style.width = "auto";
+        if (title) {
+          title.style.fontSize = "24px";
+        }
+        content.style.fontSize = "16px";
+      }
+    };
+
+    // Initial call to set the correct styles
+    handleMediaQueryChange(mediaQuery);
+
+    // Add listener for viewport changes
+    mediaQuery.addListener(handleMediaQueryChange);
+  }
+}
+
+class PageTeam extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  render() {
+    const teamData = JSON.parse(this.getAttribute("data") || "[]");
+    const options = JSON.parse(this.getAttribute("options") || "{}");
+
+    const imageShape = options.imageShape || "circle";
+    const bgColor = options.bgColor || "#f8f9fa";
+    const textColor = options.textColor || "#333333";
+    const accentColor = options.accentColor || "#007bff";
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          background-color: ${bgColor};
+          color: ${textColor};
+          font-family: 'Arial', sans-serif;
+          padding: 2rem;
+        }
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+        h2 {
+          text-align: center;
+          font-size: clamp(2rem, 5vw, 2.5rem);
+          margin-bottom: 2rem;
+          color: ${accentColor};
+        }
+        .team-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 2rem;
+        }
+        .team-member {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          padding: 1.5rem;
+          background-color: ${this.lightenDarkenColor(bgColor, 20)};
+          border-radius: 10px;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .team-member:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .member-image {
+          width: 150px;
+          height: 150px;
+          object-fit: cover;
+          border: 3px solid ${accentColor};
+          ${
+            imageShape === "circle"
+              ? "border-radius: 50%;"
+              : "border-radius: 10px;"
+          }
+          margin-bottom: 1rem;
+        }
+        .member-name {
+          font-size: clamp(1.1rem, 3vw, 1.25rem);
+          font-weight: bold;
+          margin-bottom: 0.5rem;
+        }
+        .member-role {
+          font-size: clamp(0.9rem, 2.5vw, 1rem);
+          color: ${accentColor};
+          margin-bottom: 1rem;
+        }
+        .member-bio {
+          font-size: clamp(0.8rem, 2vw, 0.9rem);
+          line-height: 1.5;
+        }
+        @media (max-width: 1024px) {
+          .team-grid {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          }
+        }
+        @media (max-width: 768px) {
+          :host {
+            padding: 1.5rem;
+          }
+          .team-grid {
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+          }
+          .member-image {
+            width: 120px;
+            height: 120px;
+          }
+        }
+        @media (max-width: 480px) {
+          :host {
+            padding: 1rem;
+          }
+          .team-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+          }
+          .team-member {
+            padding: 1rem;
+          }
+          .member-image {
+            width: 100px;
+            height: 100px;
+          }
+        }
+      </style>
+      <div class="container">
+        <h2>Our Team</h2>
+        <div class="team-grid">
+          ${teamData
+            .map(
+              (member) => `
+            <div class="team-member">
+              <img src="${member.image}" alt="${member.name}" class="member-image">
+              <div class="member-name">${member.name}</div>
+              <div class="member-role">${member.role}</div>
+              <div class="member-bio">${member.bio}</div>
+            </div>
+          `
+            )
+            .join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  lightenDarkenColor(col, amt) {
+    let usePound = false;
+    if (col[0] == "#") {
+      col = col.slice(1);
+      usePound = true;
+    }
+    let num = parseInt(col, 16);
+    let r = (num >> 16) + amt;
+    if (r > 255) r = 255;
+    else if (r < 0) r = 0;
+    let b = ((num >> 8) & 0x00ff) + amt;
+    if (b > 255) b = 255;
+    else if (b < 0) b = 0;
+    let g = (num & 0x0000ff) + amt;
+    if (g > 255) g = 255;
+    else if (g < 0) g = 0;
+    return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
+  }
+}
+
+class PageProductInfo extends HTMLElement {
+  connectedCallback() {
+    this.render();
+  }
+
+  render() {
+    const dataAttr = this.getAttribute("data");
+    const optionAttr = this.getAttribute("option");
+    if (!dataAttr) {
+      console.error("No data attribute provided for page-product-info");
+      return;
+    }
+    const data = JSON.parse(dataAttr.replace(/'/g, '"'));
+    const option = optionAttr
+      ? JSON.parse(optionAttr.replace(/'/g, '"'))
+      : {
+          layout: "vertical",
+          bgColor: "#ffffff",
+          textColor: "#333333",
+          buttonColor: "#4CAF50",
+          buttonTextColor: "#ffffff",
+        };
+
+    this.innerHTML = `
+      <div class="product-info-wrapper">
+        <div class="image-container">
+          <img src="${data.image}" alt="${data.title}">
+        </div>
+        <div class="content-container">
+          <h2>${data.title}</h2>
+          <p>${data.text}</p>
+          <button class="read-more-btn">${
+            data.buttonText || "Read More"
+          }</button>
+        </div>
+      </div>
+    `;
+
+    const style = document.createElement("style");
+    style.textContent = `
+      @media (max-width: 768px) {
+        .product-info-wrapper {
+          flex-direction: column !important;
+          align-items: stretch !important;
+        }
+        .image-container {
+          flex: 1 !important;
+          max-width: 100% !important;
+        }
+      }
+    `;
+    this.appendChild(style);
+
+    this.style.cssText = `
+      display: block;
+      font-family: Arial, sans-serif;
+      background-color: ${option.bgColor};
+      color: ${option.textColor};
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    `;
+
+    const wrapper = this.querySelector(".product-info-wrapper");
+    wrapper.style.cssText = `
+      display: flex;
+      flex: 1;
+      flex-direction: ${option.layout === "horizontal" ? "row" : "column"};
+      align-items: ${option.layout === "horizontal" ? "center" : "stretch"};
+      gap: ${option.layout === "horizontal" ? "10px" : "20px"};
+      spacing: 10px
+    `;
+
+    const imageContainer = this.querySelector(".image-container");
+    imageContainer.style.cssText = `
+      flex: ${option.layout === "horizontal" ? "0 0 40%" : "1"};
+      max-width: ${option.layout === "horizontal" ? "40%" : "100%"};
+    `;
+
+    const image = this.querySelector("img");
+    image.style.cssText = `
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      border-radius: 8px;
+    `;
+
+    const contentContainer = this.querySelector(".content-container");
+    contentContainer.style.cssText = `
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    `;
+
+    const title = this.querySelector("h2");
+    title.style.cssText = `
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 24px;
+    `;
+
+    const text = this.querySelector("p");
+    text.style.cssText = `
+      margin: 0 0 20px 0;
+      font-size: 16px;
+      line-height: 1.5;
+    `;
+
+    const button = this.querySelector(".read-more-btn");
+    button.style.cssText = `
+      align-self: flex-start;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      color: ${option.buttonTextColor};
+      background-color: ${option.buttonColor};
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.1s;
+    `;
+
+    button.addEventListener("mouseover", () => {
+      button.style.backgroundColor = this.lightenDarkenColor(
+        option.buttonColor,
+        -20
+      );
+    });
+
+    button.addEventListener("mouseout", () => {
+      button.style.backgroundColor = option.buttonColor;
+    });
+
+    button.addEventListener("mousedown", () => {
+      button.style.transform = "scale(0.98)";
+    });
+
+    button.addEventListener("mouseup", () => {
+      button.style.transform = "scale(1)";
+    });
+  }
+
+  lightenDarkenColor(col, amt) {
+    let usePound = false;
+    if (col[0] == "#") {
+      col = col.slice(1);
+      usePound = true;
+    }
+    let num = parseInt(col, 16);
+    let r = (num >> 16) + amt;
+    if (r > 255) r = 255;
+    else if (r < 0) r = 0;
+    let b = ((num >> 8) & 0x00ff) + amt;
+    if (b > 255) b = 255;
+    else if (b < 0) b = 0;
+    let g = (num & 0x0000ff) + amt;
+    if (g > 255) g = 255;
+    else if (g < 0) g = 0;
+    return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
+  }
+}
+
 class PageAICodeEditor extends HTMLElement {
   constructor() {
     super();
@@ -2345,6 +2891,250 @@ class PageAICodeEditor extends HTMLElement {
   }
 }
 
+class PageTestimonial extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  render() {
+    const data = JSON.parse(this.getAttribute("data") || "{}");
+    const theme = this.getAttribute("theme") || "light";
+    const bgColor =
+      this.getAttribute("bg-color") ||
+      (theme === "dark" ? "#2c3e50" : "#ffffff");
+    const textColor =
+      this.getAttribute("text-color") ||
+      (theme === "dark" ? "#ecf0f1" : "#2c3e50");
+    const fontSize = this.getAttribute("font-size") || "16px";
+    const fontStyle = this.getAttribute("font-style") || "Arial, sans-serif";
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          font-family: ${fontStyle};
+          font-size: ${fontSize};
+          max-width: 800px;
+          margin: 2rem auto;
+          background-color: ${bgColor};
+          color: ${textColor};
+          border-radius: 12px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+          overflow: hidden;
+          transition: all 0.3s ease;
+        }
+
+        :host(:hover) {
+          transform: translateY(-5px);
+          box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .testimonial-container {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          padding: 2rem;
+        }
+
+        .image-container {
+          flex: 0 0 150px;
+          margin-right: 2rem;
+        }
+
+        .image-container img {
+          width: 150px;
+          height: 150px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 4px solid ${theme === "dark" ? "#3498db" : "#e74c3c"};
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-container {
+          flex: 1;
+        }
+
+        .quote {
+          font-size: 1.2em;
+          line-height: 1.6;
+          margin-bottom: 1rem;
+          font-style: italic;
+          position: relative;
+        }
+
+        .quote::before,
+        .quote::after {
+          content: '"';
+          font-size: 3em;
+          color: ${theme === "dark" ? "#3498db" : "#e74c3c"};
+          position: absolute;
+          opacity: 0.3;
+        }
+
+        .quote::before {
+          top: -1rem;
+          left: -1rem;
+        }
+
+        .quote::after {
+          bottom: -2rem;
+          right: -1rem;
+        }
+
+        .author {
+          font-weight: bold;
+          font-size: 1.1em;
+          margin-bottom: 0.3rem;
+        }
+
+        .role {
+          font-size: 0.9em;
+          opacity: 0.7;
+        }
+
+        @media (max-width: 600px) {
+          .testimonial-container {
+            flex-direction: column;
+            text-align: center;
+          }
+
+          .image-container {
+            margin-right: 0;
+            margin-bottom: 1.5rem;
+          }
+        }
+      </style>
+      <div class="testimonial-container">
+        <div class="image-container">
+          <img src="${data.image}" alt="${data.name}">
+        </div>
+        <div class="content-container">
+          <div class="quote">${data.quote}</div>
+          <div class="author">${data.name}</div>
+          <div class="role">${data.role}</div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+class PageHeading extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  render() {
+    const subtitle = this.getAttribute("subtitle") || "";
+    const title = this.getAttribute("title") || "";
+    const text = this.getAttribute("text") || "";
+
+    const options = {
+      bgColor: this.getAttribute("bg-color") || "transparent",
+      subtitleColor: this.getAttribute("subtitle-color") || "#666",
+      titleColor: this.getAttribute("title-color") || "#333",
+      textColor: this.getAttribute("text-color") || "#444",
+      subtitleFont: this.getAttribute("subtitle-font") || "inherit",
+      titleFont: this.getAttribute("title-font") || "inherit",
+      textFont: this.getAttribute("text-font") || "inherit",
+      subtitleSize: this.getAttribute("subtitle-size") || "16",
+      titleSize: this.getAttribute("title-size") || "40",
+      textSize: this.getAttribute("text-size") || "16",
+      align: this.getAttribute("align") || "center",
+      padding: this.getAttribute("padding") || "2rem",
+    };
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          background-color: ${options.bgColor};
+          padding: ${options.padding};
+          text-align: ${options.align};
+        }
+        .heading-container {
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+        .subtitle {
+          color: ${options.subtitleColor};
+          font-family: ${options.subtitleFont};
+          font-size: calc(${options.subtitleSize}px + 0.1vw);
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+        }
+        .title {
+          color: ${options.titleColor};
+          font-family: ${options.titleFont};
+          font-size: calc(${options.titleSize}px + 1vw);
+          margin: 0.5rem 0;
+          font-weight: bold;
+          line-height: 1.2;
+        }
+        .text {
+          color: ${options.textColor};
+          font-family: ${options.textFont};
+          font-size: calc(${options.textSize}px + 0.1vw);
+          margin-top: 1rem;
+          line-height: 1.5;
+          max-width: 800px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+        @media (max-width: 768px) {
+          :host {
+            padding: 1.5rem;
+          }
+          .subtitle {
+            font-size: calc(${options.subtitleSize}px - 2px);
+          }
+          .title {
+            font-size: calc(${options.titleSize}px - 8px);
+          }
+          .text {
+            font-size: calc(${options.textSize}px - 1px);
+          }
+        }
+        @media (max-width: 480px) {
+          :host {
+            padding: 1rem;
+          }
+          .subtitle {
+            font-size: calc(${options.subtitleSize}px - 4px);
+          }
+          .title {
+            font-size: calc(${options.titleSize}px - 16px);
+          }
+          .text {
+            font-size: calc(${options.textSize}px - 2px);
+          }
+        }
+      </style>
+      <div class="heading-container">
+        ${subtitle ? `<div class="subtitle">${subtitle}</div>` : ""}
+        <h2 class="title">${title}</h2>
+        ${text ? `<div class="text">${text}</div>` : ""}
+      </div>
+    `;
+  }
+}
+
+customElements.define("page-heading", PageHeading);
+customElements.define("page-testimonial", PageTestimonial);
+customElements.define("page-team", PageTeam);
+customElements.define("page-product-info", PageProductInfo);
+customElements.define("page-image-content", PageImageContent);
 customElements.define("page-ai-code-editor", PageAICodeEditor);
 customElements.define("page-bottom", PageBottom);
 customElements.define("page-card", PageCard);

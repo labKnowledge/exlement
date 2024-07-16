@@ -5,17 +5,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exlement Demo</title>
-    <link rel="stylesheet" href="https://unpkg.com/exlement@1.0.0/assets/css/exlement.css">
-    <script src="https://unpkg.com/exlement@1.0.0/exlement.js"></script>
+    <link rel="stylesheet" href="../assets/css/exlement.css">
+    <script src="../exlement.js"></script>
 </head>
 
 <body>
     <page-base>
         <page-top
-            data="{'logo': '../assets/imgs/express_element-logo.jpeg', 'links': ['Home', 'About', 'Contact']}"></page-top>
+            data='{"logo": "../assets/imgs/express_element-logo.jpeg", "links": [{"text": "Home", "url": "#home"}, {"text": "About", "url": "#about"}, {"text": "Contact", "url": "#contact"}]}'
+            option='{"logo": "center", "bgColor": "#4a90e2", "textColor": "#ffffff"}'></page-top>
         <page-container>
 
+            <page-heading subtitle="Welcome to our" title="Ready made components"
+                text="This component now adjusts beautifully across all device sizes, ensuring your headings always look great."
+                bg-color="#f0f4f8" subtitle-color="#0066cc" title-color="#003366" text-color="#333333"
+                subtitle-font="'Roboto', sans-serif" title-font="'Playfair Display', serif"
+                text-font="'Open Sans', sans-serif" subtitle-size="18" title-size="48" text-size="18" align="center"
+                padding="4rem 2rem"></page-heading>
             <page-content level="1" text="Welcome to Exlement"></page-content>
+            <page-image-content
+                data='{"image": "../assets/imgs/chat_component.png", "title": "Optional Title", "content": "Your content goes here. It can be a longer paragraph describing something related to the image."}'
+                option='{"imagePosition": "left"}'></page-image-content>
+
+            <page-image-content
+                data='{"image": "../assets/imgs/chat_component.png", "title": "Optional Title", "content": "Your content goes here. It can be a longer paragraph describing something related to the image."}'
+                option='{"imagePosition": "right"}'></page-image-content>
             <page-layout column="2">
                 <page-content level="7"
                     text="Build websites faster than ever with custom HTML elements! "></page-content>
@@ -25,13 +39,59 @@
 
             </page-layout>
             <page-layout column="3">
-                <page-column>Column 1 content</page-column>
-                <page-column>Column 2 content</page-column>
-                <page-column>Column 3 content</page-column>
+                <page-column>
+                    <page-product-info
+                        data='{"image": "../assets/imgs/express_element-logo.jpeg", "title": "Product Name", "text": "This is a brief description of the product. It can be a couple of sentences long to give a good overview.", "buttonText": "Learn More"}'
+                        option='{"layout": "vertical", "bgColor": "#f0f0f0", "textColor": "#333333", "buttonColor": "#4CAF50", "buttonTextColor": "#ffffff"}'></page-product-info></page-column>
+                <page-column><page-product-info
+                        data='{"image": "../assets/imgs/express_element-logo.jpeg", "title": "Product Name", "text": "This is a brief description of the product. It can be a couple of sentences long to give a good overview.", "buttonText": "Learn More"}'
+                        option='{"layout": "vertical", "bgColor": "#f0f0f0", "textColor": "#333333", "buttonColor": "#4CAF50", "buttonTextColor": "#ffffff"}'></page-product-info></page-column>
+                <page-column><page-product-info
+                        data='{"image": "../assets/imgs/express_element-logo.jpeg", "title": "Product Name", "text": "This is a brief description of the product. It can be a couple of sentences long to give a good overview.", "buttonText": "Learn More"}'
+                        option='{"layout": "vertical", "bgColor": "#f0f0f0", "textColor": "#333333", "buttonColor": "#4CAF50", "buttonTextColor": "#ffffff"}'></page-product-info></page-column>
             </page-layout>
+
+
+            <page-layout column="4" options='{"size": "same", "padding": "20px"}' custom-css='{"margin-top": "30px", }'>
+                <page-column>
+                    <page-container>
+                        <page-product-info
+                            data='{"image": "../assets/imgs/express_element-logo.jpeg", "title": "Product Name", "text": "This is a brief description of the product. It can be a couple of sentences long to give a good overview.", "buttonText": "Learn More"}'
+                            option='{"layout": "horizontal", "bgColor": "#f0f0f0", "textColor": "#333333", "buttonColor": "#4CAF50", "buttonTextColor": "#ffffff"}'></page-product-info>
+                    </page-container>
+                </page-column>
+                <page-column>
+                    <page-container>
+                        <page-product-info
+                            data='{"image": "../assets/imgs/express_element-logo.jpeg", "title": "Product Name", "text": "This is a brief description of the product. It can be a couple of sentences long to give a good overview.", "buttonText": "Learn More"}'
+                            option='{"layout": "horizontal", "bgColor": "#f0f0f0", "textColor": "#333333", "buttonColor": "#4CAF50", "buttonTextColor": "#ffffff"}'></page-product-info>
+                    </page-container>
+                </page-column>
+
+            </page-layout>
+            <page-container>
+                <page-team data='[
+                    {"name": "John Doe", "role": "CEO", "image": "../assets/imgs/express_element-logo.jpeg", "bio": "John is our visionary leader..."},
+                    {"name": "Jane Smith", "role": "CTO", "image": "../assets/imgs/express_element-logo.jpeg", "bio": "Jane is a tech genius..."},
+                    {"name": "Mike Johnson", "role": "Designer", "image": "../assets/imgs/express_element-logo.jpeg", "bio": "Mike creates stunning designs..."}
+                  ]' options='{
+                    "imageShape": "circle",
+                    "bgColor": "#f0f4f8",
+                    "textColor": "#333333",
+                    "accentColor": "#3498db"
+                  }'></page-team>
+            </page-container>
         </page-container>
 
-        <page-bottom data="{'copyright': '2024 Exlement', 'links': ['Privacy', 'Terms']}"></page-bottom>
+        <page-container>
+
+            <page-testimonial
+                data='{"image": "../assets/imgs/express_element-logo.jpeg", "name": "John Doe", "role": "CEO, TechCorp", "quote": "This product has revolutionized our workflow. Its an absolute game-changer!"}'
+                theme="light"></page-testimonial>
+        </page-container>
+        <page-bottom
+            data='{"copyright": "2024 Exlement", "links": [{"text": "Privacy", "url": "/privacy"}, {"text": "Terms", "url": "/terms"}]}'
+            option='{"bgColor": "#4a90e2", "textColor": "#ffffff", "align": "center"}'></page-bottom>
     </page-base>
 </body>
 
