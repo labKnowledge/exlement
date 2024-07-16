@@ -156,6 +156,86 @@ Quick reference guide for Exlement components and their attributes:
         </page-ai-code-editor>
     ```
 
+15. `<page-heading>`
+    - subtitle: Subtitle text
+    - title: Main title text 
+    - text: Additional text content
+    - Various styling attributes (e.g., bg-color, subtitle-color, title-color, etc.)
+
+    ```html
+        <page-heading
+            subtitle="Welcome to"
+            title="Exlement Framework"
+            text="Build powerful websites with ease"
+            bg-color="#f8f9fa"
+            subtitle-color="#666"
+            title-color="#333"
+            text-color="#444">
+        </page-heading>
+    ```
+
+16. `<page-testimonial>`
+
+    - data: JSON string containing testimonial information
+    - theme: Color theme for the testimonial
+    - bg-color: Background color
+    - text-color: Text color
+    - font-size: Font size for the testimonial
+    - font-style: Font family for the testimonial
+    ```html
+        <page-testimonial
+            data='{"image": "user.jpg", "quote": "Great product!", "name": "Jane Doe", "role": "Customer"}'
+            theme="light"
+            bg-color="#ffffff"
+            text-color="#333333"
+            font-size="16px"
+            font-style="Arial, sans-serif"> 
+        </page-testimonial>
+    ```
+17. `<page-product-info>`
+
+    - `data`: JSON string containing product information
+    - `option`: JSON string for layout and styling options
+    ```html
+        <page-product-info
+            data="{'image': 'product.jpg', 'title': 'Product Name', 'text': 'Description', 'buttonText': 'Buy Now'}"
+            option="{'layout': 'horizontal', 'bgColor': '#ffffff'}">
+        </page-product-info>
+    ```
+18. `<page-team>`
+    - `data`: JSON string containing team member information
+    - `options`: JSON string for styling options
+    ```html
+        <page-team
+            data='[{"name": "John Doe", "role": "Developer", "image": "john.jpg", "bio": "Bio text"}]'
+            options='{"imageShape": "circle", "bgColor": "#f8f9fa"}'>
+        </page-team>
+    ```
+
+19. `<page-image-content>`
+
+    - `data`: JSON string containing image and content information
+    - `option`: JSON string for layout options
+    ```html
+        <page-image-content
+            data="{'image': 'image.jpg', 'title': 'Title', 'content': 'Content text'}"
+            option="{'imagePosition': 'left'}">
+        </page-image-content>
+    
+    ```
+
+20. `<page-bottom>`
+    - `data`: JSON string containing copyright and links
+    - `option`: JSON string for additional options
+    ```html
+    
+        <page-bottom
+            data="{'copyright': '2024 Exlement', 'links': ['Privacy', 'Terms']}"
+            option="{'bgColor': '#f8f9fa', 'textColor': '#333'}">
+        </page-bottom>
+    
+    ```
+
 Open AI Key  
 ```javascript
 <script>
