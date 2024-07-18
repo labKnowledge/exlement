@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PageTXAIChat Component Documentation</title>
+    <link rel="stylesheet" href="https://unpkg.com/exlement@1.0.0/assets/css/exlement.css">
+    <script src="https://unpkg.com/exlement@1.0.0/exlement.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <page-base>
+        <page-top data="{'logo': 'https://example.com/logo.png', 'links': ['Home', 'Documentation', 'GitHub']}">
+        </page-top>
+
+        <page-container>
+            <page-heading title="PageTXAIChat Component Documentation"
+                subtitle="Integrating Transformers.js into Your Web Applications"
+                text="Discover how to use the PageTXAIChat component to add AI-powered chat functionality to your web projects."
+                bg-color="#f0f8ff" title-color="#0066cc" subtitle-color="#ff6600" text-color="#333333"
+                title-font="'Montserrat', sans-serif" subtitle-font="'Roboto', sans-serif"
+                text-font="'Open Sans', sans-serif" title-size="36" subtitle-size="20" text-size="18"
+                padding="2rem"></page-heading>
+
+            <page-content level="2" text="Overview"></page-content>
+            <page-content level="7"
+                text="The PageTXAIChat component is a custom web component that integrates Transformers.js to provide an AI-powered chat interface. It allows developers to easily incorporate advanced language models directly into their web applications, enabling real-time, client-side AI interactions."></page-content>
+
+            <page-content level="2" text="Features"></page-content>
+            <pre>
+- Seamless integration of Transformers.js
+- Support for various open-source language models
+- Real-time, streaming responses
+- Customizable appearance
+- Easy-to-use API
+            </pre>
+
+            <page-content level="2" text="Usage"></page-content>
+            <page-content level="7"
+                text="To use the PageTXAIChat component in your HTML, simply include the following tag:"></page-content>
+            <pre>&lt;page-tx-chat&gt;&lt;/page-tx-chat&gt;</pre>
+
+            <page-content level="2" text="Attributes"></page-content>
+            <pre>
+&lt;page-tx-chat
+  model="string"      &lt;!-- Specifies the Hugging Face model to use --&gt;
+  theme="string"      &lt;!-- Sets the color theme ("light" or "dark") --&gt;
+  placeholder="string"&lt;!-- Sets the placeholder text for the input field --&gt;
+  send-button-text="string" &lt;!-- Sets the text for the send button --&gt;
+  task="string"       &lt;!-- Specifies the task for the AI model --&gt;
+&gt;&lt;/page-tx-chat&gt;
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| model | String | "Xenova/Phi-3-mini-4k-instruct" | Specifies the Hugging Face model to use |
+| theme | String | "light" | Sets the color theme ("light" or "dark") |
+| placeholder | String | "Type a message" | Sets the placeholder text for the input field |
+| send-button-text | String | "Send" | Sets the text for the send button |
+| task | String | "text-generation" | Specifies the task for the AI model |
+            </pre>
+
+            <page-content level="2" text="Example"></page-content>
+            <pre>
+&lt;page-tx-chat
+  model="Xenova/Phi-3-mini-4k-instruct"
+  theme="dark"
+  placeholder="Ask me anything..."
+  send-button-text="Go"
+  task="text-generation"
+&gt;&lt;/page-tx-chat&gt;
+            </pre>
+
+            <page-content level="2" text="Live Demo"></page-content>
+            <page-tx-chat model="Xenova/Phi-3-mini-4k-instruct" theme="light"
+                placeholder="Ask me about the PageTXAIChat component..." send-button-text="Send"
+                task="text-generation"></page-tx-chat>
+
+            <page-content level="2" text="Styling"></page-content>
+            <page-content level="7"
+                text="The component uses Shadow DOM for encapsulation. You can customize the appearance by modifying the CSS variables:"></page-content>
+            <pre>
+page-tx-chat {
+  --chat-bg-color: #f0f0f0;
+  --chat-text-color: #333;
+  --chat-input-bg: #fff;
+  --chat-input-color: #000;
+  --chat-button-bg: #4CAF50;
+  --chat-button-color: #fff;
+}
+            </pre>
+
+            <page-content level="2" text="Browser Support"></page-content>
+            <pre>
+This component relies on modern web technologies including Custom Elements v1 and Shadow DOM v1. It is supported in all major modern browsers.
+            </pre>
+
+            <page-content level="2" text="Performance Considerations"></page-content>
+            <pre>
+- The AI model is loaded and run client-side, which may require significant processing power and memory.
+- Initial load time may be longer due to downloading the model.
+- Consider using a smaller model for better performance on less powerful devices.
+            </pre>
+
+            <page-content level="2" text="Security"></page-content>
+            <pre>
+As the AI processing happens client-side, no data is sent to external servers, enhancing privacy and data security.
+            </pre>
+
+            <page-content level="2" text="License"></page-content>
+            <pre>
+This component is released under the MIT License.
+            </pre>
+        </page-container>
+
+        <page-bottom data="{'copyright': '2024 Exlement', 'links': ['Privacy', 'Terms']}"></page-bottom>
+    </page-base>
+
+    <script>
+        // This is a placeholder for the API key. In a real application, you would need to securely manage this key.
+        window.EXLEMENT_CONFIG = {
+            OPENAI_API_KEY: 'your-api-key-here'
+        };
+    </script>
+</body>
+
+</html>

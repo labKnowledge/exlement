@@ -703,6 +703,9 @@ class PageLayout extends HTMLElement {
       case "side-bar-right":
         templateColumns = "1fr 250px";
         break;
+      case "stq":
+        templateColumns = " 1fr 0.5fr";
+        break;
       default:
         templateColumns = `repeat(${columns}, 1fr)`;
     }
@@ -3130,6 +3133,431 @@ class PageHeading extends HTMLElement {
   }
 }
 
+class PageTranslator extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this.worker = null;
+  }
+
+  static get observedAttributes() {
+    return ["data", "options", "model"];
+  }
+
+  async connectedCallback() {
+    this.render();
+    await this.initializeTranslator();
+    this.setupEventListeners();
+  }
+
+  disconnectedCallback() {
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
+    }
+  }
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      this.render();
+      if (name === "model") {
+        this.initializeTranslator();
+      }
+    }
+  }
+
+  render() {
+    const data = JSON.parse(this.getAttribute("data") || "{}");
+    const options = JSON.parse(this.getAttribute("options") || "{}");
+    const customModel = this.getAttribute("model");
+
+    const languages = data.languages || [
+      { code: "en", name: "English" },
+      { code: "fr", name: "French" },
+      { code: "es", name: "Spanish" },
+      { code: "de", name: "German" },
+    ];
+
+    const defaultModels = [
+      { name: "T5 Small", value: "Xenova/t5-small" },
+      { name: "M2M100 418M", value: "Xenova/m2m100_418M" },
+      { name: "All MiniLM L6", value: "Xenova/all-MiniLM-L6-v2" },
+      {
+        name: "NLLB 200 Distilled 600M",
+        value: "Xenova/nllb-200-distilled-600M",
+      },
+    ];
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          font-family: ${options.fontFamily || "'Roboto', Arial, sans-serif"};
+          --primary-color: ${options.primaryColor || "#4285F4"};
+          --secondary-color: ${options.secondaryColor || "#34A853"};
+          --background-color: ${options.backgroundColor || "#ffffff"};
+          --text-color: ${options.textColor || "#202124"};
+          --border-color: ${options.borderColor || "#dfe1e5"};
+          --input-bg-color: #ffffff;
+          --box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        }
+        .container {
+          background-color: var(--background-color);
+          border-radius: 8px;
+          padding: 24px;
+          box-shadow: var(--box-shadow);
+          max-width: 800px;
+          margin: 0 auto;
+        }
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+        h2 {
+          color: var(--primary-color);
+          margin: 0;
+          font-size: 24px;
+          font-weight: 400;
+        }
+        .language-controls {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 16px;
+        }
+        .input-group {
+          flex: 1 1;
+        }
+        label {
+          display: block;
+          margin-bottom: 8px;
+          color: var(--text-color);
+          font-size: 14px;
+        }
+        select, textarea {
+          width: 100%;
+          padding: 12px;
+          border: 1px solid var(--border-color);
+          border-radius: 4px;
+          font-size: 16px;
+          background-color: var(--input-bg-color);
+          transition: border-color 0.3s, box-shadow 0.3s;
+          box-sizing: border-box;
+        }
+        select {
+          appearance: none;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 12px center;
+          box-sizing: border-box;
+          border: none;
+        }
+        .text-areas {
+          display: flex;
+          gap: 20px;
+        }
+        .text-area-wrapper {
+          flex: 1;
+          position: relative;
+        }
+        textarea {
+          resize: none;
+          height: 150px;
+          font-family: inherit;
+          line-height: 1.5;
+          overflow-y: auto;
+        }
+        select:focus, textarea:focus {
+          outline: none;
+          border-color: var(--primary-color);
+          box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+        }
+        select:focus {
+          border: none;
+        }
+        button {
+          background-color: var(--primary-color);
+          color: white;
+          border: none;
+          padding: 10px 24px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          transition: background-color 0.3s, box-shadow 0.3s;
+          position: absolute;
+          bottom: 12px;
+          right: 12px;
+        }
+        button:hover:not(:disabled) {
+          background-color: var(--secondary-color);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.24);
+        }
+        button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+        #status, #progress-text {
+          margin-top: 12px;
+          font-style: italic;
+          color: var(--text-color);
+          text-align: center;
+          font-size: 14px;
+        }
+        #loading-spinner {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(255, 255, 255, 0.7);
+          display: none;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+        }
+        .spinner {
+          width: 50px;
+          height: 50px;
+          border: 3px solid var(--primary-color);
+          border-top: 3px solid transparent;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        @media (max-width: 768px) {
+          .container {
+            padding: 16px;
+            border-radius: 0;
+          }
+          .text-areas {
+            flex-direction: column;
+          }
+          .language-controls {
+            flex-direction: column;
+            gap: 20px;
+          }
+          .header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+          }
+          h2 {
+            font-size: 20px;
+          }
+          textarea {
+            height: 120px;
+          }
+          button {
+            position: static;
+            width: 100%;
+            margin-top: 12px;
+          }
+        }
+      </style>
+      <div class="container">
+        <div class="header">
+          <h2>${options.title || "Translate"}</h2>
+          ${
+            !customModel
+              ? `
+          <select id="model-select">
+            ${defaultModels
+              .map(
+                (model) =>
+                  `<option value="${model.value}">${model.name}</option>`
+              )
+              .join("")}
+          </select>
+        `
+              : ""
+          }
+        </div>
+        <div class="language-controls">
+          <div class="input-group">
+            <select id="source-lang">
+              ${languages
+                .map(
+                  (lang) => `<option value="${lang.code}">${lang.name}</option>`
+                )
+                .join("")}
+            </select>
+          </div>
+          <div class="input-group">
+            <select id="target-lang">
+              ${languages
+                .map(
+                  (lang) => `<option value="${lang.code}">${lang.name}</option>`
+                )
+                .join("")}
+            </select>
+          </div>
+        </div>
+        <div class="text-areas">
+          <div class="text-area-wrapper">
+            <textarea id="input-text" placeholder="Enter text"></textarea>
+          </div>
+          <div class="text-area-wrapper">
+            <textarea id="output" readonly placeholder="Translation"></textarea>
+            <button id="translate-btn">${
+              options.buttonText || "Translate"
+            }</button>
+          </div>
+        </div>
+        <div id="status"></div>
+        <div id="progress-text"></div>
+        <div id="loading-spinner">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  async initializeTranslator() {
+    const modelName =
+      this.getAttribute("model") ||
+      this.shadowRoot.getElementById("model-select")?.value ||
+      "Xenova/t5-small";
+
+    const translateBtn = this.shadowRoot.getElementById("translate-btn");
+    translateBtn.disabled = true;
+    this.updateStatus("Initializing translator...");
+
+    const workerScript = `
+          import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
+
+        // The key environment that should be set for transformer to work
+         env.allowLocalModels = false;
+          env.useBrowserCache = true;
+         env.remoteModelPath = "https://huggingface.co/";
+
+          let translator;
+
+          async function initTranslator(model) {
+              translator = await pipeline('translation', model);
+          }
+
+          self.onmessage = async function (e) {
+              if (e.data.type === 'init') {
+                self.postMessage({ type: 'notification', text: e.data.model });
+                  try {
+                     translator = await pipeline('translation', e.data.model);
+                      self.postMessage({ type: 'init_complete' });
+                  } catch (error) {
+                      self.postMessage({ type: 'error', message: error.message });
+                  }
+              } else if (e.data.type === 'translate') {
+                  try {
+                      const result = await translator(e.data.text, {
+                          src_lang: e.data.sourceLang,
+                          tgt_lang: e.data.targetLang,
+                          max_length: 1000,
+                      });
+                      self.postMessage({
+                          type: 'translation_complete',
+                          result: result[0].translation_text,
+                      });
+                  } catch (error) {
+                      self.postMessage({ type: 'error', message: error.message });
+                  }
+              }
+          };
+      `;
+
+    const blob = new Blob([workerScript], { type: "application/javascript" });
+    this.worker = new Worker(URL.createObjectURL(blob), { type: "module" });
+    this.worker.postMessage({ type: "init", model: modelName });
+
+    this.worker.onmessage = (e) => {
+      if (e.data.type === "init_complete") {
+        this.updateStatus("Translator ready");
+        translateBtn.disabled = false;
+      } else if (e.data.type === "notification") {
+        this.updateStatus(`${e.data.text} is downloading...`);
+      } else if (e.data.type === "translation_complete") {
+        const output = this.shadowRoot.getElementById("output");
+        output.textContent = e.data.result;
+        this.updateStatus("Translation complete");
+        translateBtn.disabled = false;
+        this.shadowRoot.getElementById("loading-spinner").style.display =
+          "none";
+      } else if (e.data.type === "error") {
+        this.updateStatus(`Error: ${e.data.message}`);
+        translateBtn.disabled = false;
+        this.shadowRoot.getElementById("loading-spinner").style.display =
+          "none";
+      }
+    };
+  }
+
+  setupEventListeners() {
+    const translateBtn = this.shadowRoot.getElementById("translate-btn");
+    translateBtn.addEventListener("click", () => this.translate());
+
+    const modelSelect = this.shadowRoot.getElementById("model-select");
+    if (modelSelect) {
+      modelSelect.addEventListener("change", () => this.initializeTranslator());
+    }
+
+    const inputText = this.shadowRoot.getElementById("input-text");
+    inputText.addEventListener("input", () => this.handleInputChange());
+  }
+
+  handleInputChange() {
+    const translateBtn = this.shadowRoot.getElementById("translate-btn");
+    const inputText = this.shadowRoot.getElementById("input-text").value;
+    translateBtn.disabled = !inputText.trim();
+  }
+
+  translate() {
+    const translateBtn = this.shadowRoot.getElementById("translate-btn");
+    const loadingSpinner = this.shadowRoot.getElementById("loading-spinner");
+    translateBtn.disabled = true;
+    loadingSpinner.style.display = "flex";
+    this.updateStatus("Translating...");
+
+    const sourceLang = this.shadowRoot.getElementById("source-lang").value;
+    const targetLang = this.shadowRoot.getElementById("target-lang").value;
+    const inputText = this.shadowRoot.getElementById("input-text").value;
+
+    if (!inputText.trim()) {
+      this.shadowRoot.getElementById("output").textContent =
+        "Please enter text to translate.";
+      this.updateStatus("");
+      translateBtn.disabled = false;
+      loadingSpinner.style.display = "none";
+      return;
+    }
+
+    this.worker.postMessage({
+      type: "translate",
+      text: inputText,
+      sourceLang: sourceLang,
+      targetLang: targetLang,
+    });
+  }
+
+  updateStatus(message) {
+    const status = this.shadowRoot.getElementById("status");
+    status.textContent = message;
+  }
+
+  updateProgress(progress) {
+    const progressText = this.shadowRoot.getElementById("progress-text");
+
+    if (progress.status === "download") {
+      const percentage = ((progress.loaded / progress.total) * 100).toFixed(2);
+      progressText.textContent = `Downloading model: ${percentage}%`;
+    } else if (progress.status === "init") {
+      progressText.textContent = "Initializing model...";
+    }
+  }
+}
+
+customElements.define("page-translator", PageTranslator);
 customElements.define("page-heading", PageHeading);
 customElements.define("page-testimonial", PageTestimonial);
 customElements.define("page-team", PageTeam);

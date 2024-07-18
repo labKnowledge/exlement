@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exlement Demo</title>
+    <link rel="stylesheet" href="https://unpkg.com/exlement@1.1.0/assets/css/exlement.css">
+    <script src="https://unpkg.com/exlement@1.1.0/exlement.js"></script>
+    <script src="https://unpkg.com/exlement@1.1.0/tx-exlement.js"></script>
+</head>
+
+<body>
+    <page-base>
+        <page-top
+            data='{"logo": "../assets/imgs/express_element-logo.jpeg", "links": [{"text": "Home", "url": "#home"}, {"text": "About", "url": "#about"}, {"text": "Contact", "url": "#contact"}]}'
+            option='{"logo": "left", "bgColor": "#4a90e2", "textColor": "#ffffff"}'></page-top>
+        <page-container>
+            <page-container>
+                <page-heading title="Exlement: Bringing Transformers.js to Everyone"
+                    subtitle="Revolutionizing Web Development"
+                    text="Discover how Exlement integrates Transformers.js to create powerful, open-source AI-powered chat components for your web applications."
+                    bg-color="#f0f8ff" title-color="#0066cc" subtitle-color="#ff6600" text-color="#333333"
+                    title-font="'Montserrat', sans-serif" subtitle-font="'Roboto', sans-serif"
+                    text-font="'Open Sans', sans-serif" title-size="48" subtitle-size="20" text-size="18"
+                    padding="3rem"></page-heading>
+            </page-container>
+
+            <page-container></page-container>
+            <page-tx-chat model="Xenova/LaMini-Flan-T5-783M" task="text2text-generation" theme="dark"
+                placeholder="Ask me anything..." send-button-text="Go"></page-tx-chat>
+
+            <!-- <page-container>
+                <page-layout column="4">
+                    <page-tx-chat model="Xenova/Phi-3-mini-4k-instruct" theme="light"
+                        placeholder="Ask me about technology..." send-button-text="Send" primary-color="#f98"
+                        secondary-color="#4169E1" font-family="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+                        border-radius="10px"></page-tx-chat>
+
+                    <page-tx-chat model="Xenova/Phi-3-mini-4k-instruct" theme="dark"
+                        placeholder="Discuss environmental topics..." send-button-text="Go" primary-color="#32CD32"
+                        secondary-color="#228B22" font-family="'Roboto', Arial, sans-serif"
+                        border-radius="8px"></page-tx-chat>
+
+                    <page-tx-chat model="Xenova/Phi-3-mini-4k-instruct" theme="light"
+                        placeholder="Chat about nature and wildlife..." send-button-text="Ask" primary-color="#8B4513"
+                        secondary-color="#A0522D" font-family="'Georgia', serif" border-radius="15px"></page-tx-chat>
+
+                    <page-tx-chat model="Xenova/Phi-3-mini-4k-instruct" theme="light"
+                        placeholder="Discuss design and aesthetics..." send-button-text="→" primary-color="#333333"
+                        secondary-color="#666666" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+                        border-radius="0px"></page-tx-chat>
+                </page-layout>
+            </page-container> -->
+
+            <!-- 'Xenova/tiny_starcoder_py',
+            'Xenova/codegen-350M-mono',|text2text-generation -Xenova/LaMini-Flan-T5-783M | 'text-generation', 'Xenova/Phi-3-mini-4k-instruct' | 'text-generation', 'microsoft/Phi-3-mini-4k-instruct-onnx-web' -->
+        </page-container>
+        <page-bottom
+            data='{"copyright": "2024 Exlement", "links": [{"text": "Privacy", "url": "/privacy"}, {"text": "Terms", "url": "/terms"}]}'
+            option='{"bgColor": "#4a90e2", "textColor": "#ffffff", "align": "center"}'></page-bottom>
+    </page-base>
+</body>
+
+</html>

@@ -37,6 +37,15 @@
                     data="{'image': 'https://unpkg.com/exlement@1.0.2/assets/imgs/chat_component.png', 'title': 'Interactive Components', 'content': 'Create engaging user experiences with built-in interactive elements like chat interfaces, AI code editors, and dynamic layouts - all with simple HTML-like syntax.'}"
                     option="{'imagePosition': 'right'}"></page-image-content>
             </page-layout>
+            <page-layout column="2" options="{'size':'stq'}">
+                <page-ai-code-editor ai-type="openai" model="gpt-3.5-turbo"
+                    server-url="https://api.openai.com/v1/chat/completions" language="javascript">
+                </page-ai-code-editor>
+                <page-heading subtitle="AI Powered Component" title="Ready-made Component for your project"
+                    text="Exlement offers a wide range of components to accelerate your web development process. Here are some of our standout features:"
+                    padding="4rem 2rem 2rem"></page-heading>
+
+            </page-layout>
 
             <page-heading subtitle="Key Components" title="Powerful Building Blocks"
                 text="Exlement offers a wide range of components to accelerate your web development process. Here are some of our standout features:"
@@ -88,7 +97,8 @@
 
         </page-container>
 
-        <page-bottom data="{'copyright': '2024 Exlement', 'links': ['Privacy', 'Terms', 'Contact']}"
+        <page-bottom
+            data="{'copyright': '2024 Exlement', 'links': [{'text':'Privacy', 'url':'#'}, {'tex':'Terms', 'url': '#'}, {'text': 'Contact', 'url': '#'}]}"
             option="{'bgColor': '#2c3e50', 'textColor': '#ecf0f1', 'align': 'center'}"></page-bottom>
     </page-base>
 </body>

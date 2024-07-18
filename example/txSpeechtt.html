@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exlement Demo</title>
+    <link rel="stylesheet" href="../assets/css/exlement.css">
+    <script src="../exlement.js"></script>
+    <script src="../tx-exlement.js"></script>
+</head>
+
+<body>
+    <page-base>
+        <page-top
+            data='{"logo": "../assets/imgs/express_element-logo.jpeg", "links": [{"text": "Home", "url": "#home"}, {"text": "About", "url": "#about"}, {"text": "Contact", "url": "#contact"}]}'
+            option='{"logo": "left", "bgColor": "#4a90e2", "textColor": "#ffffff"}'></page-top>
+        <page-container>
+            <page-container>
+                <page-heading subtitle="Exlement AI Component"
+                    title="PageTranslator: AI-Powered Translation for Your Website"
+                    text="Empower your web applications with state-of-the-art translation capabilities. Easy to integrate, highly customizable, and powered by Transformers.js."
+                    bg-color="#f0f8ff" subtitle-color="#3498db" title-color="#2c3e50" text-color="#34495e"
+                    subtitle-size="18" title-size="42" text-size="20" align="center" padding="3rem"></page-heading>
+            </page-container>
+            <page-contianer>
+                <page-speech-to-text options='{"title": "Speech to Text Converter", "primaryColor": "#4285F4"}'
+                    model="Xenova/whisper-tiny.en"></page-speech-to-text>
+            </page-contianer>
+        </page-container>
+        <page-bottom
+            data='{"copyright": "2024 Exlement", "links": [{"text": "Privacy", "url": "/privacy"}, {"text": "Terms", "url": "/terms"}]}'
+            option='{"bgColor": "#4a90e2", "textColor": "#ffffff", "align": "center"}'></page-bottom>
+    </page-base>
+</body>
+
+</html>
