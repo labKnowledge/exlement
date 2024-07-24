@@ -7,7 +7,7 @@
     <title>Exlement Demo</title>
     <link rel="stylesheet" href="https://unpkg.com/exlement@1.1.0/assets/css/exlement.css">
     <script src="https://unpkg.com/exlement@1.1.0/exlement.js"></script>
-    <script src="https://unpkg.com/exlement@1.1.0/tx-exlement.js"></script>
+    <script src="../tx-exlement.js"></script>
 </head>
 
 <body>
@@ -27,11 +27,8 @@
             </page-container>
 
             <page-container></page-container>
-
-            <page-tx-chat model="Xenova/LaMini-Flan-T5-783M" task="text2text-generation" theme="dark"
-                placeholder="Ask me anything..." send-button-text="Send">
-            </page-tx-chat>
-
+            <page-tx-chat model="Xenova/Phi-3-mini-4k-instruct" theme="light" placeholder="Ask me anything..."
+                send-button-text="Send" task="text-generation"></page-tx-chat>
             <!-- <page-container>
                 <page-layout column="4">
                     <page-tx-chat model="Xenova/Phi-3-mini-4k-instruct" theme="light"

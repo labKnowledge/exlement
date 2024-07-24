@@ -951,6 +951,754 @@ class PageTXAIChat extends HTMLElement {
   }
 }
 
+class PageTXONNAIChat extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this.messages = [];
+    this.worker = null;
+    this.streamingResponse = "";
+  }
+
+  static get observedAttributes() {
+    return ["model", "theme", "placeholder", "send-button-text", "task"];
+  }
+
+  connectedCallback() {
+    this.render();
+    this.initializeWorker();
+    this.setupEventListeners();
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      this.render();
+      if (name === "model") {
+        this.initializeWorker();
+      }
+    }
+  }
+
+  disconnectedCallback() {
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
+    }
+  }
+
+  render() {
+    const theme = this.getAttribute("theme") || "light";
+    const placeholder = this.getAttribute("placeholder") || "Type a message";
+    const sendButtonText = this.getAttribute("send-button-text") || "Send";
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          font-family: Arial, sans-serif;
+          max-width: 600px;
+          margin: 0 auto;
+        }
+        .chat-container {
+          border: 1px solid ${theme === "dark" ? "#444" : "#ddd"};
+          border-radius: 8px;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          height: 500px;
+          background-color: ${theme === "dark" ? "#222" : "#f0f0f0"};
+          color: ${theme === "dark" ? "#fff" : "#000"};
+        }
+        .chat-messages {
+          flex-grow: 1;
+          overflow-y: auto;
+          padding: 1rem;
+        }
+        .message {
+          max-width: 70%;
+          padding: 0.5rem 1rem;
+          border-radius: 18px;
+          margin-bottom: 0.5rem;
+          word-wrap: break-word;
+          clear: both;
+        }
+        .user-message {
+          background-color: ${theme === "dark" ? "#2c3e50" : "#dcf8c6"};
+          float: right;
+        }
+        .ai-message {
+          background-color: ${theme === "dark" ? "#34495e" : "#ffffff"};
+          float: left;
+        }
+        .chat-input {
+          display: flex;
+          padding: 1rem;
+          background-color: ${theme === "dark" ? "#333" : "#ffffff"};
+          border-top: 1px solid ${theme === "dark" ? "#444" : "#ddd"};
+        }
+        input {
+          flex-grow: 1;
+          padding: 0.5rem;
+          border: 1px solid ${theme === "dark" ? "#444" : "#ddd"};
+          border-radius: 20px;
+          margin-right: 0.5rem;
+          background-color: ${theme === "dark" ? "#444" : "#fff"};
+          color: ${theme === "dark" ? "#fff" : "#000"};
+        }
+        button {
+          background-color: #4CAF50;
+          color: white;
+          border: none;
+          border-radius: 20px;
+          padding: 0.5rem 1rem;
+          cursor: pointer;
+          transition: background-color 0.3s;
+        }
+        button:hover {
+          background-color: #45a049;
+        }
+        button:disabled {
+          background-color: #cccccc;
+          cursor: not-allowed;
+        }
+        .status {
+          text-align: center;
+          padding: 0.5rem;
+          font-style: italic;
+          color: ${theme === "dark" ? "#aaa" : "#666"};
+        }
+        .hidden {
+          display: none;
+        }
+      </style>
+      <div class="chat-container">
+        <div class="chat-messages"></div>
+        <div class="status">Initializing AI model...</div>
+        <div class="chat-input">
+          <input type="text" placeholder="${placeholder}" disabled>
+          <button disabled>${sendButtonText}</button>
+        </div>
+      </div>
+    `;
+  }
+
+  initializeWorker() {
+    const modelName =
+      this.getAttribute("model") || "Xenova/Phi-3-mini-4k-instruct";
+    const taskType = this.getAttribute("task") || "text-generation";
+    const workerScript = `
+      import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
+      import * as ort from 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.18.0/dist/ort.min.js';
+
+      env.allowLocalModels = false;
+      env.useBrowserCache = true;
+      env.remoteModelPath = "https://huggingface.co/";
+
+      let pipe;
+      let tokenizer;
+
+      async function initializePipeline(task, model) {
+        // Check for WebGPU support
+        const gpuSupported = await ort.env.webgpu.isWebGPUSupported();
+        // console.log(gpuSupported)
+        if (gpuSupported) {
+          ort.env.wasm.numThreads = 1;
+          await ort.env.webgpu.initWebGPU();
+          console.log("Using WebGPU for acceleration");
+        } else {
+          console.log("WebGPU not supported, falling back to default execution provider");
+        }
+
+        pipe = await pipeline(task, model, { executionProvider: gpuSupported ? 'webgpu' : 'wasm' });
+        tokenizer = await pipe.tokenizer;
+      }
+
+      self.onmessage = async function(e) {
+        if(e.data.type === 'init'){
+          self.postMessage({ type: 'notification', text: e.data.model });
+          try{ 
+            await initializePipeline(e.data.task, e.data.model);
+            self.postMessage({ type: 'ready' });
+          } catch(error){
+            self.postMessage({ type: 'error', message: error.message });
+          }
+        }
+        else if (e.data.type === 'generate') {
+          try {
+            let generatedTokens = [];
+            let previousText = '';
+            const result = await pipe(e.data.prompt, {
+              max_new_tokens: 128,
+              temperature: 0.7,
+              stream: true,
+              callback_function: (x) => {
+                if (x[0].output_token_ids && x[0].output_token_ids.length > 0) {
+                    generatedTokens = x[0].output_token_ids;
+                    const fullText = tokenizer.decode(generatedTokens, { skip_special_tokens: true });
+                    const newText = fullText.slice(previousText.length);
+                    if (newText) {
+                        self.postMessage({ type: 'token', text: newText });
+                        previousText = fullText;
+                    }
+                }
+                return false;
+              }
+            });
+            const fullText = tokenizer.decode(generatedTokens, { skip_special_tokens: true });
+            self.postMessage({ type: 'complete', text: "" });
+          } catch (error) {
+            self.postMessage({ type: 'error', message: error.message });
+          }
+        }
+      };
+    `;
+
+    const blob = new Blob([workerScript], { type: "application/javascript" });
+    this.worker = new Worker(URL.createObjectURL(blob), { type: "module" });
+    this.worker.postMessage({ type: "init", model: modelName, task: taskType });
+
+    this.worker.onmessage = (e) => {
+      if (e.data.type === "ready") {
+        this.updateStatus("AI model ready");
+        this.enableInput();
+        setTimeout(() => this.hideStatus(), 3000);
+      } else if (e.data.type === "token") {
+        this.updateStreamingMessage(e.data.text);
+      } else if (e.data.type === "complete") {
+        this.enableInput();
+      } else if (e.data.type === "error") {
+        this.updateStatus(`Error: ${e.data.message}`);
+        this.enableInput();
+      } else if (e.data.type === "notification") {
+        this.updateStatus(`Loading model: ${e.data.text}`);
+      }
+    };
+  }
+
+  updateStreamingMessage(text) {
+    const chatMessages = this.shadowRoot.querySelector(".chat-messages");
+    let messageElement = chatMessages.querySelector(".ai-message:last-child");
+
+    if (!messageElement) {
+      messageElement = document.createElement("div");
+      messageElement.classList.add("message", "ai-message");
+      chatMessages.appendChild(messageElement);
+    }
+
+    messageElement.textContent += text;
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  setupEventListeners() {
+    const input = this.shadowRoot.querySelector("input");
+    const button = this.shadowRoot.querySelector("button");
+
+    button.addEventListener("click", () => this.sendMessage());
+    input.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        this.sendMessage();
+      }
+    });
+  }
+
+  sendMessage() {
+    const input = this.shadowRoot.querySelector("input");
+    const message = input.value.trim();
+
+    if (message) {
+      this.addMessage(message, "user");
+      input.value = "";
+      this.disableInput();
+
+      const prompt = this.generatePrompt(message);
+      this.worker.postMessage({ type: "generate", prompt });
+    }
+  }
+
+  generatePrompt(message) {
+    const context = this.messages
+      .slice(-5)
+      .map((m) => `${m.type === "user" ? "Human" : "AI"}: ${m.text}`)
+      .join("\n");
+    return message;
+  }
+
+  addMessage(text, type) {
+    const chatMessages = this.shadowRoot.querySelector(".chat-messages");
+    const messageElement = document.createElement("div");
+    messageElement.classList.add("message", `${type}-message`);
+    messageElement.textContent = text;
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    this.messages.push({ text, type });
+  }
+
+  updateStatus(message) {
+    const status = this.shadowRoot.querySelector(".status");
+    status.textContent = message;
+    status.classList.remove("hidden");
+  }
+
+  hideStatus() {
+    const status = this.shadowRoot.querySelector(".status");
+    status.classList.add("hidden");
+  }
+
+  enableInput() {
+    const input = this.shadowRoot.querySelector("input");
+    const button = this.shadowRoot.querySelector("button");
+    input.disabled = false;
+    button.disabled = false;
+    input.focus();
+  }
+
+  disableInput() {
+    const input = this.shadowRoot.querySelector("input");
+    const button = this.shadowRoot.querySelector("button");
+    input.disabled = true;
+    button.disabled = true;
+  }
+}
+
+class PageVoiceAIAssistant extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this.worker = null;
+    this.recognition = null;
+    this.synthesis = window.speechSynthesis;
+    this.isListening = false;
+    this.transcript = "";
+    this.silenceTimer = null;
+    this.VAD_SILENCE_THRESHOLD = 2000;
+    this.isAISpeaking = false;
+    this.conversationHistory = [];
+    this.maxHistoryLength = 5; // Number of turns to remember
+  }
+
+  static get observedAttributes() {
+    return [
+      "model",
+      "language",
+      "task",
+      "theme",
+      "title",
+      "show-transcript",
+      "height",
+      "width",
+      "background",
+      "max-history",
+    ];
+  }
+
+  connectedCallback() {
+    this.render();
+    this.initializeWorker();
+    this.setupSpeechRecognition();
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      if (name === "model" || name === "task") {
+        this.initializeWorker();
+      } else if (name === "language") {
+        this.setupSpeechRecognition();
+      } else if (name === "max-history") {
+        this.maxHistoryLength = parseInt(newValue) || 5;
+      } else {
+        this.render();
+      }
+    }
+  }
+
+  disconnectedCallback() {
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
+    }
+    if (this.recognition) {
+      this.recognition.stop();
+    }
+  }
+
+  render() {
+    const theme = this.getAttribute("theme") || "modern";
+    const title = this.getAttribute("title") || "AI Assistant";
+    const showTranscript = this.getAttribute("show-transcript") !== "false";
+    const height = this.getAttribute("height") || "400px";
+    const width = this.getAttribute("width") || "100%";
+    const background = this.getAttribute("background") || "";
+
+    const styles = this.getThemeStyles(theme);
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        ${styles}
+        :host {
+          display: block;
+          font-family: var(--font-family);
+          width: ${width};
+          height: ${height};
+        }
+        .container {
+          background: ${background || "var(--background)"};
+          border-radius: var(--border-radius);
+          padding: var(--padding);
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        }
+        #voiceWave {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100px;
+        }
+        .wave {
+          width: var(--wave-width);
+          height: var(--wave-height);
+          margin: var(--wave-margin);
+          border-radius: var(--wave-border-radius);
+          opacity: 0.3;
+          transition: opacity 0.3s ease, background 0.3s ease;
+        }
+        .wave.user {
+          background: var(--user-wave-color);
+          animation: userWave 1s ease-in-out infinite;
+        }
+        .wave.ai {
+          background: var(--ai-wave-color);
+          animation: aiWave 1.5s ease-in-out infinite;
+        }
+        @keyframes userWave {
+          0%, 100% { height: var(--wave-height); }
+          50% { height: calc(var(--wave-height) * 0.5); }
+        }
+        @keyframes aiWave {
+          0%, 100% { height: var(--wave-height); }
+          50% { height: calc(var(--wave-height) * 1.5); }
+        }
+        .wave.active {
+          opacity: 1;
+        }
+        #status {
+          font-size: var(--status-font-size);
+          margin: var(--status-margin);
+        }
+        #transcript {
+          font-size: var(--transcript-font-size);
+          margin-top: var(--transcript-margin-top);
+          flex-grow: 1;
+          overflow-y: auto;
+          text-align: left;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+          display: ${showTranscript ? "block" : "none"};
+        }
+      </style>
+      <div class="container">
+        <h1>${title}</h1>
+        <div id="voiceWave">
+          <div class="wave user"></div>
+          <div class="wave user" style="animation-delay: 0.3s;"></div>
+          <div class="wave user" style="animation-delay: 0.6s;"></div>
+        </div>
+        <div id="status">Initializing...</div>
+        <div id="transcript"></div>
+      </div>
+    `;
+  }
+
+  getThemeStyles(theme) {
+    const themes = {
+      modern: `
+        :host {
+          --font-family: 'Roboto', sans-serif;
+          --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          --border-radius: 20px;
+          --padding: 30px;
+          --wave-width: 6px;
+          --wave-height: 40px;
+          --wave-margin: 8px;
+          --wave-border-radius: 3px;
+          --user-wave-color: linear-gradient(45deg, #00aeff, #a68eff);
+          --ai-wave-color: linear-gradient(45deg, #ff9a9e, #fad0c4);
+          --status-font-size: 18px;
+          --status-margin: 20px 0;
+          --transcript-font-size: 16px;
+          --transcript-margin-top: 20px;
+        }
+        h1 {
+          color: #ffffff;
+          font-size: 28px;
+          margin-bottom: 20px;
+        }
+        #status, #transcript {
+          color: #ffffff;
+        }
+      `,
+      minimal: `
+        :host {
+          --font-family: 'Arial', sans-serif;
+          --background: #ffffff;
+          --border-radius: 10px;
+          --padding: 20px;
+          --wave-width: 4px;
+          --wave-height: 30px;
+          --wave-margin: 6px;
+          --wave-border-radius: 2px;
+          --user-wave-color: #3498db;
+          --ai-wave-color: #2ecc71;
+          --status-font-size: 16px;
+          --status-margin: 15px 0;
+          --transcript-font-size: 14px;
+          --transcript-margin-top: 15px;
+        }
+        h1 {
+          color: #333333;
+          font-size: 24px;
+          margin-bottom: 15px;
+        }
+        #status, #transcript {
+          color: #666666;
+        }
+        .container {
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+      `,
+      futuristic: `
+        :host {
+          --font-family: 'Orbitron', sans-serif;
+          --background: #000000;
+          --border-radius: 0;
+          --padding: 25px;
+          --wave-width: 5px;
+          --wave-height: 50px;
+          --wave-margin: 10px;
+          --wave-border-radius: 0;
+          --user-wave-color: #00ff00;
+          --ai-wave-color: #ff00ff;
+          --status-font-size: 18px;
+          --status-margin: 25px 0;
+          --transcript-font-size: 16px;
+          --transcript-margin-top: 25px;
+        }
+        h1 {
+          color: #00ff00;
+          font-size: 32px;
+          margin-bottom: 25px;
+          text-transform: uppercase;
+        }
+        #status, #transcript {
+          color: #ffffff;
+        }
+        .container {
+          border: 2px solid #00ff00;
+          box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+        .wave {
+          box-shadow: 0 0 10px var(--user-wave-color);
+        }
+        .wave.ai {
+          box-shadow: 0 0 10px var(--ai-wave-color);
+        }
+      `,
+    };
+
+    return themes[theme] || themes.modern;
+  }
+
+  initializeWorker() {
+    const modelName = this.getAttribute("model") || "Xenova/distilgpt2";
+    const taskType = this.getAttribute("task") || "text-generation";
+    const workerScript = `
+      import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
+
+      env.allowLocalModels = false;
+      env.useBrowserCache = true;
+      env.remoteModelPath = "https://huggingface.co/";
+
+      let pipe;
+
+      async function initializePipeline(task, model) {
+        pipe = await pipeline(task, model);
+      }
+
+      self.onmessage = async function(e) {
+        if (e.data.type === 'init') {
+          self.postMessage({ type: 'notification', text: e.data.model });
+          try {
+            await initializePipeline(e.data.task, e.data.model);
+            self.postMessage({ type: 'ready' });
+          } catch (error) {
+            self.postMessage({ type: 'error', message: error.message });
+          }
+        } else if (e.data.type === 'generate') {
+          try {
+            let result;
+            if (e.data.task === 'text-generation') {
+              result = await pipe(e.data.prompt, {
+                max_new_tokens: 100,
+                temperature: 0.7,
+              });
+              result = result[0].generated_text;
+            } else if (e.data.task === 'text2text-generation') {
+              result = await pipe(e.data.prompt,e.data.context, {
+                max_length: 100
+              });
+              result = result[0].generated_text;
+            } else if (e.data.task === 'question-answering') {
+              result = await pipe({
+                question: e.data.prompt,
+                context: "Answer this question based on your knowledge."
+              });
+              result = result.answer;
+            } else {
+              result = await pipe(e.data.prompt);
+              result = JSON.stringify(result);
+            }
+            self.postMessage({ type: 'complete', text: result });
+          } catch (error) {
+            self.postMessage({ type: 'error', message: error.message });
+          }
+        }
+      };
+    `;
+
+    const blob = new Blob([workerScript], { type: "application/javascript" });
+    this.worker = new Worker(URL.createObjectURL(blob), { type: "module" });
+    this.worker.postMessage({ type: "init", model: modelName, task: taskType });
+
+    this.worker.onmessage = (e) => {
+      if (e.data.type === "ready") {
+        this.updateStatus("AI model ready. Start speaking...");
+        this.startListening();
+      } else if (e.data.type === "complete") {
+        this.speakResponse(e.data.text);
+      } else if (e.data.type === "error") {
+        this.updateStatus(`Error: ${e.data.message}`);
+      } else if (e.data.type === "notification") {
+        this.updateStatus(`Loading model: ${e.data.text}`);
+      }
+    };
+  }
+
+  setupSpeechRecognition() {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      this.updateStatus("Speech recognition not supported in this browser.");
+      return;
+    }
+
+    this.recognition = new SpeechRecognition();
+    this.recognition.lang = this.getAttribute("language") || "en-US";
+    this.recognition.continuous = true;
+    this.recognition.interimResults = true;
+
+    this.recognition.onresult = (event) => {
+      const currentTranscript = Array.from(event.results)
+        .map((result) => result[0].transcript)
+        .join("");
+
+      this.updateTranscript(currentTranscript);
+      this.resetSilenceTimer();
+      this.activateWaveAnimation("user");
+    };
+
+    this.recognition.onerror = (event) => {
+      this.updateStatus(`Error: ${event.error}`);
+    };
+
+    this.recognition.onend = () => {
+      if (this.isListening) {
+        this.recognition.start();
+      }
+    };
+  }
+
+  startListening() {
+    if (!this.isListening) {
+      this.isListening = true;
+      this.recognition.start();
+      this.updateStatus("Listening...");
+    }
+  }
+
+  stopListening() {
+    if (this.isListening) {
+      this.isListening = false;
+      this.recognition.stop();
+      this.updateStatus("Processing...");
+    }
+  }
+
+  resetSilenceTimer() {
+    clearTimeout(this.silenceTimer);
+    this.silenceTimer = setTimeout(() => {
+      this.stopListening();
+      this.generateResponse(this.transcript);
+      this.transcript = "";
+    }, this.VAD_SILENCE_THRESHOLD);
+  }
+
+  activateWaveAnimation(type) {
+    const waves = this.shadowRoot.querySelectorAll(".wave");
+    waves.forEach((wave) => {
+      wave.classList.remove("user", "ai");
+      wave.classList.add(type, "active");
+    });
+  }
+
+  deactivateWaveAnimation() {
+    const waves = this.shadowRoot.querySelectorAll(".wave");
+    waves.forEach((wave) => wave.classList.remove("active"));
+  }
+
+  generateResponse(transcript) {
+    this.conversationHistory.push({ role: "user", content: transcript });
+    const taskType = this.getAttribute("task") || "text-generation";
+    this.worker.postMessage({
+      type: "generate",
+      prompt: transcript,
+      task: taskType,
+      context: this.conversationHistory.map((item) => item.content).join(" "),
+    });
+    // console.log("sending to AI", this.conversationHistory);
+  }
+
+  speakResponse(text) {
+    this.isAISpeaking = true;
+    this.activateWaveAnimation("ai");
+    this.updateTranscript(`AI: ${text}`);
+    this.conversationHistory.push({ role: "ai", content: text });
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = this.getAttribute("language") || "en-US";
+    utterance.onend = () => {
+      this.isAISpeaking = false;
+      this.deactivateWaveAnimation();
+      this.startListening();
+    };
+    this.synthesis.speak(utterance);
+    console.log("Received from AI", this.conversationHistory);
+  }
+
+  updateStatus(message) {
+    this.shadowRoot.getElementById("status").textContent = message;
+  }
+
+  updateTranscript(text) {
+    this.transcript = text;
+    const transcriptElement = this.shadowRoot.getElementById("transcript");
+    transcriptElement.textContent = text;
+    transcriptElement.scrollTop = transcriptElement.scrollHeight;
+  }
+}
+
+customElements.define("page-voice-ai-assistant", PageVoiceAIAssistant);
+customElements.define("page-txonn-chat", PageTXONNAIChat);
 customElements.define("page-tx-image-captioner", PageTXImageCaptioner);
 customElements.define("page-tx-chat", PageTXAIChat);
 customElements.define("page-tx-speech-to-text", PageTXSpeechToText);

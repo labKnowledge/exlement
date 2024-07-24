@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exlement Demo</title>
+    <link rel="stylesheet" href="https://unpkg.com/exlement@1.1.0/assets/css/exlement.css">
+    <script src="https://unpkg.com/exlement@1.1.0/exlement.js"></script>
+    <script src="../tx-exlement.js"></script>
+</head>
+
+<body>
+    <page-base>
+        <page-top
+            data='{"logo": "../assets/imgs/express_element-logo.jpeg", "links": [{"text": "Home", "url": "#home"}, {"text": "About", "url": "#about"}, {"text": "Contact", "url": "#contact"}]}'
+            option='{"logo": "left", "bgColor": "#4a90e2", "textColor": "#ffffff"}'></page-top>
+        <page-container>
+            <page-container>
+                <page-heading title="Exlement: Bringing Transformers.js to Everyone"
+                    subtitle="Revolutionizing Web Development"
+                    text="Discover how Exlement integrates Transformers.js to create powerful, open-source AI-powered chat components for your web applications."
+                    bg-color="#f0f8ff" title-color="#0066cc" subtitle-color="#ff6600" text-color="#333333"
+                    title-font="'Montserrat', sans-serif" subtitle-font="'Roboto', sans-serif"
+                    text-font="'Open Sans', sans-serif" title-size="48" subtitle-size="20" text-size="18"
+                    padding="3rem"></page-heading>
+            </page-container>
+            <page-container>
+
+                <page-voice-ai-assistant model="Xenova/LaMini-Flan-T5-783M" language="en-US" task="text2text-generation"
+                    theme="futuristic" title="AI Chat Assistant" width="100%" height="100%">
+                </page-voice-ai-assistant>
+
+            </page-container>
+            <!-- 'Xenova/tiny_starcoder_py',
+            'Xenova/codegen-350M-mono',| text2text-generation -Xenova/LaMini-Flan-T5-783M | show-transcript="false" | 'text-generation', 'Xenova/Phi-3-mini-4k-instruct' | 'text-generation', 'microsoft/Phi-3-mini-4k-instruct-onnx-web' -->
+        </page-container>
+        <page-bottom
+            data='{"copyright": "2024 Exlement", "links": [{"text": "Privacy", "url": "/privacy"}, {"text": "Terms", "url": "/terms"}]}'
+            option='{"bgColor": "#4a90e2", "textColor": "#ffffff", "align": "center"}'></page-bottom>
+    </page-base>
+</body>
+
+</html>

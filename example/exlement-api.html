@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elegant Proofreading</title>
+    <script src="../tx-exlement-api.js"></script>
+    <script src="https://unpkg.com/wavefile@11.0.0/dist/wavefile.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            font-size: 16px;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        button {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #result {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+        }
+
+
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, .3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Elegant Proofreading</h1>
+        <!-- <page-tx-generator id="generator" model="Xenova/mms-tts-eng" task="text-to-speech"
+            quantized="false"></page-tx-generator> -->
+        <page-tx-generator id="generator" model="Xenova/LaMini-Flan-T5-783M"
+            task="text2text-generation"></page-tx-generator>
+
+        <div id="text-input" contenteditable="true" style="height: 300px;">Enter your text here for proofreading...
+        </div>
+        <div class="button-group">
+            <button id="proofread-btn">Proofread<span id="spinner" class="spinner"
+                    style="display: none;"></span></button>
+            <button id="clear-btn">Clear</button>
+        </div>
+        <div id="result"></div>
+    </div>
+    <script>
+        const generator = document.getElementById("generator");
+        const proofreadBtn = document.getElementById('proofread-btn');
+        const spinner = document.getElementById('spinner');
+        const textInput = document.getElementById('text-input');
+        const result = document.getElementById('result');
+
+        generator.addEventListener("result", (event) => {
+            console.log("Result:", event.detail);
+            proofreadBtn.disabled = false;
+            spinner.style.display = 'none';
+
+            //const wav = new wavefile.WaveFile();
+            //wav.fromScratch(1, event.detail.sampling_rate, '32f', event.detail.audio);
+
+            //const wavBlob = new Blob([wav.toBuffer()], { type: 'audio/wav' });
+            //const audioUrl = URL.createObjectURL(wavBlob);
+
+            //const audioElement = document.createElement('audio');
+            //audioElement.src = audioUrl;
+            //audioElement.controls = true;
+            // Add the audio element to the document
+            //document.getElementById('result').appendChild(audioElement);
+            //document.getElementById('result').innerHTML = event.detail;
+            document.getElementById('result').innerHTML = event.detail[0].generated_text;
+            // Handle the result here, e.g., update the UI
+        });
+
+        generator.addEventListener("error", (event) => {
+            console.error("Error:", event.detail);
+            document.getElementById('result').innerHTML = event.detail;
+        });
+
+        proofreadBtn.addEventListener('click', function () {
+            const text = document.getElementById('text-input').textContent;
+            proofreadBtn.disabled = true;
+            spinner.style.display = 'inline-block';
+            const speaker_embeddings = 'https://huggingface.co/datasets/Xenova/transformers.js-docs/resolve/main/speaker_embeddings.bin';
+            generator.process(text);
+        });
+
+        document.getElementById('clear-btn').addEventListener('click', function () {
+            document.getElementById('text-input').value = '';
+            document.getElementById('result').innerHTML = '';
+        });
+    </script>
+</body>
+
+</html>
