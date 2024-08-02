@@ -1,6 +1,6 @@
 {
   "name": "exlement",
-  "version": "1.1.1",
+  "version": "1.1.3",
   "description": "Exlement.js is a revolutionary web development framework that extends web components  with powerful, ready to use, AI-ready custom elements. Build sophisticated websites and applications with the simplicity of writing HTML tags.",
   "main": "exlement.js",
   "directories": {
@@ -60,5 +60,8 @@
   "bugs": {
     "url": "https://github.com/labKnowledge/exlement/issues"
   },
-  "homepage": "https://github.com/labKnowledge/exlement#readme"
+  "homepage": "https://github.com/labKnowledge/exlement#readme",
+  "dependencies": {
+    "exlement": "file:"
+  }
 }
