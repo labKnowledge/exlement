@@ -700,279 +700,158 @@ class SocialMediaContentGenerator extends HTMLElement {
           this[name] = newValue;
       }
   }
-
+  
   render() {
-      this.shadowRoot.innerHTML = `
-      <style>
-        /* ... (keep existing styles) ... */
+    this.shadowRoot.innerHTML = `
+    <style>
         :host {
             display: block;
-            positon: relative
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
             background-color: #f9f9f9;
-          }
-          .chat-container {
+        }
+        .container {
             display: flex;
-            flex-direction: column;
-            height: 600px;
-          }
-          .model-selection {
-            margin-bottom: 20px;
-          }
-          select, button {
+            gap: 20px;
+        }
+        .input-panel {
+            flex: 1;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        .output-panel {
+            flex: 2;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        select, input, textarea, button {
+            width: 100%;
             padding: 10px;
-            font-size: 16px;
-            border: none;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
             border-radius: 5px;
-          }
-          select {
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-          }
-          button {
+            font-size: 14px;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        button {
             background-color: #4CAF50;
             color: white;
+            border: none;
             cursor: pointer;
             transition: background-color 0.3s;
-          }
-          button:hover {
+        }
+        button:hover {
             background-color: #45a049;
-          }
-          button:disabled {
+        }
+        button:disabled {
             background-color: #cccccc;
             cursor: not-allowed;
-          }
-          .chat-box {
-            flex: 1;
+        }
+        .chat-box {
+            height: 400px;
             overflow-y: auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
-          }
-          .message {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        .message {
             margin-bottom: 15px;
             padding: 10px;
-            border-radius: 20px;
-            max-width: 80%;
-          }
-          .user {
+            border-radius: 10px;
+            max-width: 100%;
+        }
+        .user {
             background-color: #E3F2FD;
             align-self: flex-end;
-            margin-left: auto;
-          }
-          .assistant {
+        }
+        .assistant {
             background-color: #F1F8E9;
             align-self: flex-start;
-          }
-          .chat-input {
-            display: flex;
-            margin-top: 20px;
-          }
-          input {
-            flex: 1;
-            padding: 10px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px 0 0 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-          }
-          #send {
-            border-radius: 0 5px 5px 0;
-          }
-          .status {
-            text-align: center;
+        }
+        .status {
             margin-top: 10px;
             font-style: italic;
             color: #666;
-          }
-          .message code {
-          background-color: #f0f0f0;
-          padding: 2px 4px;
-          border-radius: 4px;
-          font-family: monospace;
         }
-        .message pre {
-          background-color: #f0f0f0;
-          padding: 10px;
-          border-radius: 4px;
-          overflow-x: auto;
-          position: relative;
+        #load-model {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s;
+            z-index: 1000;
         }
-        .message pre code {
-          background-color: transparent;
-          padding: 0;
-        }
-        .message ul, .message ol {
-          margin-left: 20px;
-        }
-        .message strong {
-          font-weight: bold;
-        }
-        .message em {
-          font-style: italic;
-        }
-        .copy-button {
-          position: absolute;
-          top: 5px;
-          right: 5px;
-          padding: 2px 5px;
-          background-color: #ddd;
-          border: none;
-          border-radius: 3px;
-          cursor: pointer;
-        }
-        .copy-button:hover {
-          background-color: #ccc;
-        }
-        .chat-input-container {
-          display: flex;
-          align-items: center;
-          margin-top: 20px;
-        }
-        .input-wrapper {
-          flex-grow: 1;
-          display: flex;
-          align-items: center;
-          border: 1px solid #ccc;
-          border-radius: 5px;
-          padding: 5px;
-        }
-        .editable-area {
-          flex-grow: 1;
-          min-height: 20px;
-          max-height: 150px;
-          overflow-y: auto;
-          padding: 5px;
-          outline: none;
-        }
-        .editable-area[contenteditable]:empty::before {
-          content: attr(data-placeholder);
-          color: #888;
-        }
-        .upload-button, .model-select-button {
-          background: none;
-          border: none;
-          cursor: pointer;
-          padding: 5px;
-        }
-        .model-selector {
-          margin-left: 10px;
-        }
-        .model-select-button {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-        }
-       .model-dropdown {
-          margin-top: 5px;
-          position: relative;
-          display: inline-block;
-        }
-        .model-dropdown-content {
-          display: none;
-          position: absolute;
-          background-color: #f9f9f9;
-          min-width: 160px;
-          box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-          z-index: 1;
-        }
-        .model-dropdown-content a {
-          color: black;
-          padding: 12px 16px;
-          text-decoration: none;
-          display: block;
-        }
-        .model-dropdown-content a:hover {
-          background-color: #f1f1f1;
-        }
-        .show {
-          display: block;
-        }
-        .hidden-file-input {
-          display: none;
-        }
-      #load-model {
-        position: absolute;  
-        top: 100px;
-        right: 20px;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        cursor: pointer;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: background-color 0.3s;
-        z-index: 1000;
-      }
-        
         #load-model:hover {
             background-color: #45a049;
         }
-
         #load-model svg {
             width: 30px;
             height: 30px;
         }
-
         @keyframes rotate {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-
         #load-model.loading svg {
             animation: rotate 2s linear infinite;
         }
-        select, input, textarea {
-          width: 100%;
-          padding: 10px;
-          margin-bottom: 10px;
-          border: 1px solid #ccc;
-          border-radius: 5px;
-        }
-        textarea {
-          height: 100px;
-          resize: vertical;
-        }
-      </style>
-      <div class="chat-container">
-          <div class="model-selection">
-              <select id="model-select">
-                  ${this.availableModels.map(model => `<option value="${model}">${model}</option>`).join('')}
-              </select>
-          </div>
-          <select id="platform-select">
-              ${this.platforms.map(platform => `<option value="${platform}">${platform}</option>`).join('')}
-          </select>
-          <select id="hook-strategy-select">
-              ${this.hookStrategies.map(strategy => `<option value="${strategy}">${strategy}</option>`).join('')}
-          </select>
-          <input type="text" id="topic-input" placeholder="Enter topic/product/service">
-          <textarea id="additional-info" placeholder="Additional information or context (optional)"></textarea>
-          <div class="chat-input">
-              <button id="generate-button">Generate Post</button>
-          </div>
-          <div class="chat-box" id="chat-box"></div>
-          <div class="status" id="status"></div>
-      </div>
-      <button id="load-model" aria-label="Load Model">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              <path d="M9 12l2 2 4-4"></path>
-          </svg>
-      </button>
-      `;
-  }
+    </style>
+    <div class="container">
+        <div class="input-panel">
+            <h2>Content Generator</h2>
+            <select id="model-select">
+                ${this.availableModels.map(model => `<option value="${model}">${model}</option>`).join('')}
+            </select>
+            <select id="platform-select">
+                ${this.platforms.map(platform => `<option value="${platform}">${platform}</option>`).join('')}
+            </select>
+            <select id="hook-strategy-select">
+                ${this.hookStrategies.map(strategy => `<option value="${strategy}">${strategy}</option>`).join('')}
+            </select>
+            <input type="text" id="topic-input" placeholder="Enter topic/product/service">
+            <textarea id="additional-info" placeholder="Additional information or context (optional)"></textarea>
+            <button id="generate-button">Generate Post</button>
+            <div class="status" id="status"></div>
+        </div>
+        <div class="output-panel">
+            <h2>Generated Content</h2>
+            <div class="chat-box" id="chat-box"></div>
+        </div>
+    </div>
+    <button id="load-model" aria-label="Load Model">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            <path d="M9 12l2 2 4-4"></path>
+        </svg>
+    </button>
+    `;
+}
 
   setupEventListeners() {
       const loadModelBtn = this.shadowRoot.getElementById('load-model');
