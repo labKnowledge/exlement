@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exlement web-llm Demo</title>
+    <link rel="stylesheet" href="../assets/css/exlement.css">
+    <script src="../exlement.js"></script>
+    <script src="../webllm-exlement.js"></script>
+
+    <script type="module" src="https://esm.run/@mlc-ai/web-llm"></script>
+</head>
+
+<body>
+    <page-base>
+        <page-top
+            data='{"logo": "../assets/imgs/express_element-logo.jpeg", "links": [{"text": "Home", "url": "#home"}, {"text": "About", "url": "#about"}, {"text": "Contact", "url": "#contact"}]}'
+            option='{"logo": "left", "bgColor": "#4a90e2", "textColor": "#ffffff"}'></page-top>
+        <page-container>
+            <!-- gemma-2-2b-it-q4f16_1-MLC -->
+            <!-- Llama-3.1-8B-Instruct-q4f32_1-MLC-1k -->
+            <page-contianer>
+                <chat-webllm-component model="gemma-2-2b-it-q4f16_1-MLC" temperature="0.7"
+                    top-p="0.9"></chat-component>
+                    </page-webllm-contianer>
+        </page-container>
+        <page-bottom
+            data='{"copyright": "2024 Exlement", "links": [{"text": "Privacy", "url": "/privacy"}, {"text": "Terms", "url": "/terms"}]}'
+            option='{"bgColor": "#4a90e2", "textColor": "#ffffff", "align": "center"}'></page-bottom>
+    </page-base>
+</body>
+
+</html>
