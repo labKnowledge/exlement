@@ -28,10 +28,10 @@ Exlement.js is a revolutionary web development framework that extends HTML with 
 You can include ExpressElement in your project via CDN:
 
 ```html
-<link rel="stylesheet" href="https://unpkg.com/exlement@1.1.3/assets/css/exlement.css">
-<script src="https://unpkg.com/exlement@1.1.3/exlement.js"></script>
-<script src="https://unpkg.com/exlement@1.1.3/tx-exlement.js"></script>
-<script src="https://unpkg.com/exlement@1.1.3/webllm-exlement.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/exlement@1.2.0/assets/css/exlement.css">
+<script src="https://unpkg.com/exlement@1.2.0/exlement.js"></script>
+<script src="https://unpkg.com/exlement@1.2.0/tx-exlement.js"></script>
+<script src="https://unpkg.com/exlement@1.2.0/webllm-exlement.js"></script>
 ```
 
 ## Quick Start
@@ -46,10 +46,9 @@ Copy and paste this into an HTML file and you're ready.
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exlement Demo</title>
-    <link rel="stylesheet" href="https://unpkg.com/exlement@1.1.3/assets/css/exlement.css">
-    <script src="https://unpkg.com/exlement@1.1.3/exlement.js"></script>
-    <script src="https://unpkg.com/exlement@1.1.3/tx-exlement.js"></script>
-    <script src="https://unpkg.com/exlement@1.1.3/webllm-exlement.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/exlement@1.2.0/assets/css/exlement.css">
+    <script src="https://unpkg.com/exlement@1.2.0/exlement.js"></script>
+    
 </head>
 
 <body>
@@ -90,10 +89,9 @@ Copy and paste this into an HTML file and you're ready.
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exlement Quick Start</title>
-    <link rel="stylesheet" href="https://unpkg.com/exlement@1.1.3/assets/css/exlement.css">
-    <script src="https://unpkg.com/exlement@1.1.3/exlement.js"></script>
-    <script src="https://unpkg.com/exlement@1.1.3/tx-exlement.js"></script>
-    <script src="https://unpkg.com/exlement@1.1.3/webllm-exlement.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/exlement@1.2.0/assets/css/exlement.css">
+    <script src="https://unpkg.com/exlement@1.2.0/exlement.js"></script>
+    
 </head>
 
 <body>
@@ -134,10 +132,9 @@ Copy and paste this into an HTML file and you're ready.
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exlement Demo</title>
-    <link rel="stylesheet" href="https://unpkg.com/exlement@1.1.3/assets/css/exlement.css">
-    <script src="https://unpkg.com/exlement@1.1.3/exlement.js"></script>
-    <script src="https://unpkg.com/exlement@1.1.3/tx-exlement.js"></script>
-    <script src="https://unpkg.com/exlement@1.1.3/webllm-exlement.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/exlement@1.2.0/assets/css/exlement.css">
+    <script src="https://unpkg.com/exlement@1.2.0/exlement.js"></script>
+
 </head>
 
 <body>
@@ -173,10 +170,9 @@ Copy and paste this into an HTML file and you're ready.
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exlement Demo</title>
-    <link rel="stylesheet" href="https://unpkg.com/exlement@1.1.3/assets/css/exlement.css">
-    <script src="https://unpkg.com/exlement@1.1.3/exlement.js"></script>
-    <script src="https://unpkg.com/exlement@1.1.3/tx-exlement.js"></script>
-    <script src="https://unpkg.com/exlement@1.1.3/webllm-exlement.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/exlement@1.2.0/assets/css/exlement.css">
+    <script src="https://unpkg.com/exlement@1.2.0/exlement.js"></script>
+    
 </head>
 
 <body>

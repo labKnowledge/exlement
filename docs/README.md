@@ -17,8 +17,8 @@ Welcome to the Exlement documentation. Exlement is a revolutionary web developme
 Include Exlement in your project via CDN:
 
 ```html
-<link rel="stylesheet" href="https://unpkg.com/exlement@1.0.0/assets/css/exlement.css">
-    <script src="https://unpkg.com/exlement@1.0.0/exlement.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/exlement@1.2.0/assets/css/exlement.css">
+    <script src="https://unpkg.com/exlement@1.2.0/exlement.js"></script>
 ```
 
 
