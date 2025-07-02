@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exlement Input Demo</title>
+  <link rel="stylesheet" href="../assets/css/exlement.css">
+  <script src="../exlement.js"></script>
+  <script src="../assets/js/input-controls/ExlementInput.js"></script>
+</head>
+<body>
+  <page-base>
+    <page-top
+      data='{"logo": "../assets/imgs/express_element-logo.jpeg", "links": [{"text": "Home", "url": "#home"}, {"text": "About", "url": "#about"}, {"text": "Contact", "url": "#contact"}]}'
+      option='{"logo": "left", "bgColor": "#4a90e2", "textColor": "#ffffff"}'></page-top>
+    <page-container>
+      <page-container>
+        <page-heading
+          subtitle="Exlement Input Component"
+          title="Exlement Input Demo"
+          text="Accessible, flexible, and beautiful input fields for your UI."
+          bg-color="#f0f8ff"
+          subtitle-color="#3498db"
+          title-color="#2c3e50"
+          text-color="#34495e"
+          subtitle-size="18"
+          title-size="42"
+          text-size="20"
+          align="center"
+          padding="3rem"></page-heading>
+      </page-container>
+      <page-layout>
+        <page-container>
+          <page-heading title="Basic Input" subtitle="Default usage"></page-heading>
+          <exlement-input label="Basic" placeholder="Type here..."></exlement-input>
+        </page-container>
+        <page-container>
+          <page-heading title="Left Icon"></page-heading>
+          <exlement-input label="Search" placeholder="Search...">
+            <span slot="icon-left">🔍</span>
+          </exlement-input>
+        </page-container>
+        <page-container>
+          <page-heading title="Right Icon"></page-heading>
+          <exlement-input label="Check" placeholder="Check...">
+            <span slot="icon-right">✔️</span>
+          </exlement-input>
+        </page-container>
+        <page-container>
+          <page-heading title="Both Icons"></page-heading>
+          <exlement-input label="Both" placeholder="Both icons">
+            <span slot="icon-left">🔍</span>
+            <span slot="icon-right">✔️</span>
+          </exlement-input>
+        </page-container>
+        <page-container>
+          <page-heading title="Sizes"></page-heading>
+          <exlement-input label="Small" size="small" placeholder="Small input"></exlement-input>
+          <exlement-input label="Medium" size="medium" placeholder="Medium input"></exlement-input>
+          <exlement-input label="Large" size="large" placeholder="Large input"></exlement-input>
+        </page-container>
+        <page-container>
+          <page-heading title="Shapes"></page-heading>
+          <exlement-input label="Rounded" shape="rounded" placeholder="Rounded"></exlement-input>
+          <exlement-input label="Pill" shape="pill" placeholder="Pill"></exlement-input>
+          <exlement-input label="Square" shape="square" placeholder="Square"></exlement-input>
+        </page-container>
+        <page-container>
+          <page-heading title="Variants"></page-heading>
+          <exlement-input label="Outline" variant="outline" placeholder="Outline"></exlement-input>
+          <exlement-input label="Fancy" variant="fancy" placeholder="Fancy"></exlement-input>
+        </page-container>
+        <page-container>
+          <page-heading title="Colors"></page-heading>
+          <exlement-input label="Primary" color="primary" placeholder="Primary"></exlement-input>
+          <exlement-input label="Danger" color="danger" placeholder="Danger"></exlement-input>
+          <exlement-input label="Success" color="success" placeholder="Success"></exlement-input>
+          <exlement-input label="Warning" color="warning" placeholder="Warning"></exlement-input>
+        </page-container>
+        <page-container>
+          <page-heading title="All Features"></page-heading>
+          <exlement-input
+            label="All Features"
+            placeholder="Everything!"
+            size="large"
+            shape="pill"
+            variant="fancy"
+            color="success"
+            required
+          >
+            <span slot="icon-left">🌟</span>
+            <span slot="icon-right">✅</span>
+          </exlement-input>
+          <exlement-input
+            label="Disabled"
+            placeholder="Can't type here"
+            size="large"
+            shape="pill"
+            variant="outline"
+            color="danger"
+            disabled
+          >
+            <span slot="icon-left">🚫</span>
+          </exlement-input>
+        </page-container>
+        <page-container>
+          <page-heading title="Textarea"></page-heading>
+          <exlement-input
+            label="Textarea Example"
+            type="textarea"
+            placeholder="Type multiple lines here..."
+            size="large"
+            shape="rounded"
+            variant="outline"
+            color="primary"
+          ></exlement-input>
+        </page-container>
+      </page-layout>
+    </page-container>
+    <page-bottom
+      data='{"copyright": "2024 Exlement", "links": [{"text": "Privacy", "url": "/privacy"}, {"text": "Terms", "url": "/terms"}]}'
+      option='{"bgColor": "#4a90e2", "textColor": "#ffffff", "align": "center"}'></page-bottom>
+  </page-base>
+  <script>
+    // Log input-change events to the console and on the page
+    document.querySelectorAll('exlement-input').forEach(input => {
+      input.addEventListener('input-change', e => {
+        console.log('Input changed:', e.detail.value);
+        const log = document.getElementById('log');
+        if (log) log.setAttribute('text', 'Last input: ' + e.detail.value);
+      });
+    });
+  </script>
+</body>
+</html> 

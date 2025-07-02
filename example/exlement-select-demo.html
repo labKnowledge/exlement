@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exlement Select Demo</title>
+  <link rel="stylesheet" href="../assets/css/exlement.css">
+  <script src="../exlement.js"></script>
+  <script src="../assets/js/input-controls/ExlementSelect.js"></script>
+</head>
+<body>
+  <page-base>
+    <page-top
+      data='{"logo": "../assets/imgs/express_element-logo.jpeg", "links": [{"text": "Home", "url": "#home"}, {"text": "About", "url": "#about"}, {"text": "Contact", "url": "#contact"}]}'
+      option='{"logo": "left", "bgColor": "#4a90e2", "textColor": "#ffffff"}'></page-top>
+    <page-container>
+      <page-container>
+        <page-heading
+          subtitle="Exlement Select Component"
+          title="Exlement Select Demo"
+          text="Accessible, flexible, and beautiful select dropdowns for your UI."
+          bg-color="#f0f8ff"
+          subtitle-color="#3498db"
+          title-color="#2c3e50"
+          text-color="#34495e"
+          subtitle-size="18"
+          title-size="42"
+          text-size="20"
+          align="center"
+          padding="3rem"></page-heading>
+      </page-container>
+      <page-layout>
+        <page-container>
+          <page-heading title="Basic Select"></page-heading>
+          <exlement-select options='[{"value":"","label":"Choose..."},{"value":"1","label":"Option 1"},{"value":"2","label":"Option 2"}]'></exlement-select>
+        </page-container>
+        <page-container>
+          <page-heading title="With Label"></page-heading>
+          <exlement-select label="Pick a fruit" options='[{"value":"","label":"Select fruit"},{"value":"apple","label":"Apple"},{"value":"banana","label":"Banana"},{"value":"orange","label":"Orange"}]'></exlement-select>
+        </page-container>
+        <page-container>
+          <page-heading title="Required"></page-heading>
+          <exlement-select label="Required" required options='[{"value":"","label":"Select one"},{"value":"a","label":"A"},{"value":"b","label":"B"}]'></exlement-select>
+        </page-container>
+        <page-container>
+          <page-heading title="Disabled"></page-heading>
+          <exlement-select label="Disabled" disabled options='[{"value":"","label":"Can\'t select"},{"value":"x","label":"X"},{"value":"y","label":"Y"}]'></exlement-select>
+        </page-container>
+        <page-container>
+          <page-heading title="Options Attribute (JSON)"></page-heading>
+          <exlement-select label="From JSON" options='[{"value":"","label":"Pick one"},{"value":"js","label":"JavaScript"},{"value":"py","label":"Python"},{"value":"rb","label":"Ruby"}]'></exlement-select>
+        </page-container>
+        <page-container>
+          <page-heading title="Live Value"></page-heading>
+          <exlement-select id="live-select" label="Live" required options='[{"value":"","label":"Select"},{"value":"1","label":"One"},{"value":"2","label":"Two"},{"value":"3","label":"Three"}]'></exlement-select>
+          <page-content id="log" level="7" text="Last select:"></page-content>
+        </page-container>
+        <page-container>
+          <page-heading title="Searchable"></page-heading>
+          <exlement-select label="Searchable" searchable options='[
+            {"value":"","label":"Pick a language"},
+            {"value":"js","label":"JavaScript"},
+            {"value":"py","label":"Python"},
+            {"value":"rb","label":"Ruby"},
+            {"value":"go","label":"Go"},
+            {"value":"rs","label":"Rust"},
+            {"value":"cpp","label":"C++"}
+          ]'></exlement-select>
+        </page-container>
+        <page-container>
+          <page-heading title="Multi-Select"></page-heading>
+          <exlement-select label="Multi" multiple searchable options='[
+            {"value":"","label":"Pick tags"},
+            {"value":"ai","label":"AI"},
+            {"value":"web","label":"Web"},
+            {"value":"ml","label":"Machine Learning"},
+            {"value":"ui","label":"UI"},
+            {"value":"ux","label":"UX"}
+          ]'></exlement-select>
+        </page-container>
+        <page-container>
+          <page-heading title="With Icons & Descriptions"></page-heading>
+          <exlement-select label="With Icons" searchable options='[
+            {"value":"","label":"Pick animal"},
+            {"value":"dog","label":"Dog","icon":"🐶","description":"Loyal and friendly"},
+            {"value":"cat","label":"Cat","icon":"🐱","description":"Independent and curious"},
+            {"value":"fox","label":"Fox","icon":"🦊","description":"Clever and quick"},
+            {"value":"lion","label":"Lion","icon":"🦁","description":"Brave and strong"}
+          ]'></exlement-select>
+        </page-container>
+        <page-container>
+          <page-heading title="Size, Shape, Color, Variant"></page-heading>
+          <exlement-select label="Large Pill Primary" size="large" shape="pill" color="primary" options='[
+            {"value":"","label":"Pick one"},
+            {"value":"a","label":"A"},
+            {"value":"b","label":"B"}
+          ]'></exlement-select>
+          <exlement-select label="Small Square Danger" size="small" shape="square" color="danger" options='[
+            {"value":"","label":"Pick one"},
+            {"value":"x","label":"X"},
+            {"value":"y","label":"Y"}
+          ]'></exlement-select>
+        </page-container>
+        <page-container>
+          <page-heading title="Error & Success"></page-heading>
+          <exlement-select label="With Error" error="This is an error!" options='[
+            {"value":"","label":"Pick one"},
+            {"value":"bad","label":"Bad"},
+            {"value":"worse","label":"Worse"}
+          ]'></exlement-select>
+          <exlement-select label="With Success" success="Looks good!" options='[
+            {"value":"","label":"Pick one"},
+            {"value":"good","label":"Good"},
+            {"value":"better","label":"Better"}
+          ]'></exlement-select>
+        </page-container>
+        <page-container>
+          <page-heading title="Helper Text"></page-heading>
+          <exlement-select label="With Helper" helper="Choose wisely!" options='[
+            {"value":"","label":"Pick one"},
+            {"value":"1","label":"One"},
+            {"value":"2","label":"Two"}
+          ]'></exlement-select>
+        </page-container>
+      </page-layout>
+    </page-container>
+    <page-bottom
+      data='{"copyright": "2024 Exlement", "links": [{"text": "Privacy", "url": "/privacy"}, {"text": "Terms", "url": "/terms"}]}'
+      option='{"bgColor": "#4a90e2", "textColor": "#ffffff", "align": "center"}'></page-bottom>
+  </page-base>
+  <script>
+    // Log select-change events to the console and on the page
+    document.querySelectorAll('exlement-select').forEach(sel => {
+      sel.addEventListener('select-change', e => {
+        console.log('Select changed:', e.detail.value);
+        const log = document.getElementById('log');
+        if (log) log.setAttribute('text', 'Last select: ' + e.detail.value);
+      });
+    });
+  </script>
+</body>
+</html> 
