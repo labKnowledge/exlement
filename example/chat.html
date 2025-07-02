@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exlement Demo</title>
 
-    <link rel="stylesheet" href="https://unpkg.com/exlement@1.2.0/assets/css/exlement.css">
-    <script src="https://unpkg.com/exlement@1.2.0/exlement.js"></script>
+    <link rel="stylesheet" href="../assets/css/exlement.css">
+    <script src="../exlement.js"></script>
 
 </head>
 
@@ -16,8 +16,10 @@
         <page-top
             data="{'logo': '../assets/imgs/express_element-logo.jpeg', 'links': ['Home', 'About', 'Contact']}"></page-top>
         <page-container>
-            <page-chat server-url="https://api.openai.com/v1/chat/completions" chat-type="openai" model="gpt-3.5-turbo">
-            </page-chat>
+            <!-- <page-chat server-url="https://api.openai.com/v1/chat/completions" chat-type="openai" model="gpt-3.5-turbo">
+            </page-chat> -->
+
+            <chat-webllm-component></chat-webllm-component>
         </page-container>
 
         <page-bottom data="{'copyright': '2024 Exlement', 'links': ['Privacy', 'Terms']}"></page-bottom>
